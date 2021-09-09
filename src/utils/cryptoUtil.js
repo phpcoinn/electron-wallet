@@ -1,8 +1,8 @@
-var ellipticcurve = require("starkbank-ecdsa");
+const ellipticcurve = require("starkbank-ecdsa");
 const Base58 = require("base-58")
 const crypto = require("crypto");
-var Ecdsa = ellipticcurve.Ecdsa;
-var PrivateKey = ellipticcurve.PrivateKey;
+const Ecdsa = ellipticcurve.Ecdsa;
+const PrivateKey = ellipticcurve.PrivateKey;
 
 let pem2coin = (pem) => {
     let pemB58 = pem.replace('-----BEGIN EC PRIVATE KEY-----','')

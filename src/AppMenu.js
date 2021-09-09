@@ -1,3 +1,4 @@
+import {app, shell} from "electron";
 
 const {Menu, dialog} = require("electron");
 const App = require("./App");
@@ -14,7 +15,10 @@ let findMenuItem = (id) => {
                 return item
             }
             if(item.submenu) {
-                return findInList(item.submenu)
+                let res = findInList(item.submenu)
+                if(res) {
+                    return res
+                }
             }
         }
     }
@@ -26,33 +30,25 @@ const template = [
     {
         label: 'File',
         submenu: [
-            {
-                id:"test",
-                label: "test update",
-                click() {
-                    Wallet.testUpdate()
-                }
-            },
-            {
-                id:"delete",
-                label: "Delete",
-                click() {
-                    let response = dialog.showMessageBoxSync({
-                        buttons: ["Yes","No"],
-                        message: "Do you really want to delete wallet?"
-                    })
-                    if(response === 0) {
-                        Wallet.deleteWallet()
-                    }
-                }
-            },
+            // {
+            //     id:"delete",
+            //     label: "Delete",
+            //     click() {
+            //         let response = dialog.showMessageBoxSync({
+            //             buttons: ["Yes","No"],
+            //             message: "Do you really want to delete wallet?"
+            //         })
+            //         if(response === 0) {
+            //             Wallet.deleteWallet()
+            //         }
+            //     }
+            // },
             {
                 id: "encrypt",
                 label: "Encrypt",
                 enabled: false,
                 click() {
-                    console.log("encrypt")
-                    App.win.webContents.send("encrypt-wallet")
+                    App.goto("/encrypt")
                 }
             },
             {
@@ -71,17 +67,17 @@ const template = [
                 }
             },
             {
-                role: 'undo'
-            },
-            {
-                role: 'redo'
-            },
-            {
                 type: 'separator'
             },
             {
-                role: 'cut'
-            },
+                role: 'quit'
+            }
+        ]
+    },
+
+    {
+        label: 'Edit',
+        submenu: [
             {
                 role: 'copy'
             },
@@ -95,29 +91,39 @@ const template = [
         label: 'View',
         submenu: [
             {
-                role: 'reload',
+                label: "Home",
+                click() {
+                    App.goto( "/")
+                }
             },
             {
-                role: 'toggledevtools'
+                label: "Send",
+                click() {
+                    App.goto( "/send")
+                }
             },
             {
-                type: 'separator'
+                label: "Receive",
+                click() {
+                    App.goto( "/receive")
+                }
             },
             {
-                role: 'resetzoom'
+                label: "Miner",
+                click() {
+                    App.goto( "/miner")
+                }
             },
             {
-                role: 'zoomin'
+                type:'separator'
             },
             {
-                role: 'zoomout'
+                label: 'Refresh',
+                async click() {
+                    await Wallet.refresh()
+                    App.win.reload()
+                }
             },
-            {
-                type: 'separator'
-            },
-            {
-                role: 'togglefullscreen'
-            }
         ]
     },
 
@@ -134,6 +140,35 @@ const template = [
                 label: 'Login to online wallet...',
                 click() {
                     Wallet.openLoginLink()
+                }
+            },
+            {
+                id:'verify_address',
+                label: 'Verify address...',
+                click() {
+                    App.goto('/verify')
+                },
+                enabled: false
+            },
+            {
+                label: "Info",
+                click() {
+                    App.goto('/info')
+                }
+            },
+            {
+                label: "Peers",
+                click() {
+                    App.goto('/peers')
+                }
+            },
+            {
+                type:'separator'
+            },
+            {
+                label:'Settings',
+                click() {
+                    App.goto("/settings")
                 }
             }
         ]
@@ -155,7 +190,16 @@ const template = [
         role: 'help',
         submenu: [
             {
-                label: 'Learn More'
+                label: 'Learn More',
+                click() {
+                    shell.openExternal(App.config.aboutUrl)
+                }
+            },
+            {
+                label: "About",
+                click() {
+                    App.goto("/about")
+                }
             }
         ]
     }

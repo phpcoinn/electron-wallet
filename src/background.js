@@ -1,16 +1,14 @@
 'use strict'
 
-import {app, protocol, BrowserWindow, shell, dialog, Menu} from 'electron'
+import {app, protocol, BrowserWindow, shell, dialog, Menu, clipboard} from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 import {ipcMain} from "electron";
-import axios from 'axios'
 import * as App from './App'
 import * as Wallet from './Wallet'
 import * as AppMenu from "./AppMenu";
 import * as Miner from "./Miner";
 import {win} from "./App";
-
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -71,28 +69,25 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-  // if (isDevelopment && !process.env.IS_TEST) {
-  //   // Install Vue Devtools
-  //   try {
-  //     await installExtension(VUEJS_DEVTOOLS)
-  //   } catch (e) {
-  //     console.error('Vue Devtools failed to install:', e.toString())
-  //   }
-  // }
   await createWindow()
+
+  App.loadSettings()
+  App.loadInfo()
 
   App.updateStatus('Loading wallet...')
   await Wallet.setWalletPeer()
 
   await Wallet.loadWallet()
+  await Wallet.getTransactions()
 
+  App.state.walletData.loaded = true
   App.updateStatus(null)
-  win.webContents.send("wallet-loaded", App.walletData)
+  win.webContents.send("wallet-loaded")
 
-})
+  setInterval(async ()=>{
+    await Wallet.refresh()
+  }, 30000)
 
-ipcMain.on("get-wallet-data", async (event, args) => {
-  event.returnValue = walletData
 })
 
 // Exit cleanly on request from parent process in development mode.
@@ -110,39 +105,69 @@ if (isDevelopment) {
   }
 }
 
-let walletData =  App.walletData
-
 ipcMain.on('wallet-send',  async (event, arg) => {
-  event.returnValue = await Wallet.send(arg)
+  let res = await Wallet.send(arg)
+  await Wallet.getTransactions()
+  event.returnValue = res
 })
 
 ipcMain.on("open-wallet", async (event, arg)=>{
-  console.log("on open-wallet", arg)
   let password = arg.password
   await Wallet.openWallet(password)
-  event.reply("wallet-opened", null)
+  App.updateState()
 })
 
-ipcMain.on("get-miner", (event,args)=>{
-  console.log("on get-miner")
-  App.win.webContents.send("miner-data", Miner.minerData)
-})
 ipcMain.on("miner-cmd", (event, cmd, args)=>{
   console.log("call miner-cmd", cmd, args)
   Miner[cmd](args)
 })
-ipcMain.on('get-pending-balance', async (event, args)=>{
-  console.log("call get-pending-balance")
-  event.returnValue = await Wallet.getPendingBalance()
-})
-ipcMain.on('get-transactions', async (event, args)=>{
-  console.log("call get-transactions")
-  event.returnValue = await Wallet.getTransactions()
-})
+
 ipcMain.on("encrypt-wallet", async (event, args) => {
   let res = await Wallet.encryptWallet(args)
   event.returnValue = res
 })
+
 ipcMain.on('exit-wallet', () => {
   app.quit()
+})
+
+ipcMain.on('faucet-open-link', ()=>{
+  let url = App.config.faucetLink
+  shell.openExternal(url)
+})
+
+ipcMain.on('clipboard-copy', (event, text)=>{
+  clipboard.writeText(text);
+})
+
+ipcMain.on('save-settings', (event, config)=>{
+  App.storeSettings(config)
+  App.updateState()
+})
+
+ipcMain.on('show-context-menu', (event, data)=>{
+  let functions = {
+    addressMenu(tx) {
+      clipboard.writeText(tx.dst);
+    }
+  }
+
+  for(let i in data.menu) {
+    let item = data.menu[i]
+    item.click = functions[item.click](data.data)
+  }
+  let menu = Menu.buildFromTemplate(data.menu)
+  menu.popup()
+})
+
+ipcMain.on("app-created", () => {
+  App.updateState()
+})
+
+ipcMain.on("get-peers", async (event, data)=>{
+  event.returnValue = await Wallet.getPeers()
+})
+
+ipcMain.on("open-url", (event, url) => {
+  shell.openExternal(url)
 })

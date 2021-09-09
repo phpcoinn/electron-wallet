@@ -3,8 +3,14 @@ import {net} from "electron";
 function getResponse(response, data) {
     let r = data.toString('utf-8')
     let contentType = response.headers['content-type']
+    // console.log("contentType", contentType, response)
     if(contentType.startsWith('application/json')) {
-        r = JSON.parse(r)
+        try {
+            r = JSON.parse(r)
+        } catch (e) {
+            console.error(e)
+            r = null
+        }
     }
     return r
 }
@@ -13,12 +19,14 @@ function get(url) {
     // console.log("call axios get ", url)
     return new Promise(resolve => {
         const request = net.request(url)
+        let out = ''
         request.on('response', (response) => {
             response.on('data', (data) => {
-                resolve(getResponse(response, data))
+                out += data
             })
             response.on('end', () => {
                 // console.log('request ended')
+                resolve(getResponse(response, out))
             })
         })
         request.end()

@@ -2,38 +2,23 @@ import * as App from "@/App";
 import * as Wallet from "@/Wallet";
 import * as argon2 from "argon2"
 import crypto from "crypto";
-import * as axios from "./utils/Axios";
+import * as Axios from "./utils/Axios";
 
 
-let minerData = {
-    status: null,
-    running: false,
-    blockFound: false,
-    miner: {
-        attempt: 0,
-        block: null,
-        height: null,
-    },
-    miningStat: {
-        cnt: 0,
-        hashes: 0,
-        submits: 0,
-        accepted: 0,
-        rejected: 0,
-        dropped: 0,
-    }
-}
-
+let minerData = App.state.minerData
 
 let hashingConfig = {
     mem: 2048,
     time: 2,
     parallelism: 1
 }
-//TODO: replace for mainnet
-let block_time = 30
+let block_time = App.config.block_time
+
+let startTime
 
 function start() {
+
+    startTime = Date.now()
 
     new Promise(async (resolve, reject) => {
 
@@ -88,7 +73,7 @@ async function loop() {
             break
         }
 
-        let address = App.walletData.address
+        let address = App.state.walletData.address
         let block_date = parseInt(info.date)
         let now = Math.round(Date.now() / 1000)
         let nodeTime = info.time
@@ -102,7 +87,9 @@ async function loop() {
         let difficulty = info.difficulty
         let argon = null, nonceBase = null, calcNonce = null, hitBase = null, hashPart = null, hitValue = null
         let hit = 0
+        let maxHit = 0
         let target = 0
+        let maxTarget = 0
         let signatureBase, signature, json
         let submitResponse
         let calOffset = 0
@@ -110,6 +97,7 @@ async function loop() {
         let times = {}
         let version = info.version
         let attempt = 0
+        let runningTime
 
         minerData.miner = {
             address,
@@ -138,7 +126,8 @@ async function loop() {
             version,
             submitResponse,
             times,
-            attempt
+            attempt,
+            runningTime
         }
 
         if(Array.isArray(data) && data.length === 0) {
@@ -158,13 +147,11 @@ async function loop() {
 
             if(attempt % 10  === 0) {
                 let info = await getMineInfo()
-                if (info.status === 'ok') {
-                    console.log(`Node height ${info.data.height} we mine ${minerData.miner.height}`)
-                    if(info.data.block !==  block) {
-                        console.log(`New block detected - starting over`)
-                        minerData.miningStat.dropped ++
-                        break
-                    }
+                console.log(`Node height ${info.height} we mine ${minerData.miner.height}`)
+                if(info.block !==  block) {
+                    console.log(`New block detected - starting over`)
+                    minerData.miningStat.dropped ++
+                    break
                 }
             }
 
@@ -201,12 +188,21 @@ async function loop() {
             hashPart = hash2.substr(0, 8)
             hitValue = hexToDec(hashPart)
             hit = Math.round(max / hitValue)
+            if(hit > maxHit) {
+                maxHit = hit
+            }
             target = Math.round(difficulty * block_time / elapsed)
+            if(target > maxTarget) {
+                maxTarget  = target
+            }
             blockFound = (hit > 0 && target >= 0 && hit > target)
             console.log(`block_time=${block_time} elapsed=${elapsed} difficulty=${difficulty} hit=${hit} target=${target} blockFound=${blockFound}`)
 
             minerData.miner.hit = hit
+            minerData.miner.maxHit = maxHit
             minerData.miner.target = target
+            minerData.miner.maxTarget = maxTarget
+            minerData.miner.runningTime = Date.now() - startTime
             updateUi()
         }
 
@@ -226,13 +222,15 @@ async function loop() {
             elapsed
         }
 
-        console.log("postData", postData)
-        let response = await axios.post(App.walletData.walletPeer + '/mine.php?q=submitHash', postData)
+        console.log("postData", App.state.settings.miningNode)
+        let response = await Axios.post(App.state.settings.miningNode + '/mine.php?q=submitHash', postData)
         if(response.status === 'ok') {
             minerData.miningStat.accepted ++
+            await Wallet.refresh()
         } else {
-            console.log(response)
+            console.log(JSON.stringify(response))
             minerData.miningStat.rejected ++
+            minerData.miningStat.rejectedReason = response.data
         }
         submitResponse = response
         minerData.miner.submitResponse = submitResponse
@@ -247,8 +245,7 @@ function sha256(pwd) {
 }
 
 async function getMineInfo() {
-    let url = App.walletData.walletPeer + '/mine.php?q=info'
-    // console.log(`Getting mine data from peer ${url}`)
+    let url = App.state.walletData.walletPeer + '/mine.php?q=info'
     let info =  await Wallet.peerGet(url)
     return info
 }
@@ -261,11 +258,10 @@ function stop() {
 }
 
 function updateUi() {
-    App.win.webContents.send("miner-data", minerData)
+    App.updateState()
 }
 
 export {
-    minerData,
     start,
     stop
 }

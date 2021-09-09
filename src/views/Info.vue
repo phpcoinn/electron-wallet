@@ -1,0 +1,53 @@
+<template>
+
+    <div class="d-flex flex-row flex-fill">
+        <div class="d-flex flex-fill flex-column" style="width: 50%">
+            <div class="flex-grow-0 p-3">
+                <div class="fs-5">Wallet info</div>
+                <div class="fs-7 text-muted">Here is information about your wallet</div>
+            </div>
+
+
+            <div class="flex-fill d-flex flex-column text-center">
+                <div class="flex-grow-1 d-flex justify-content-center p-4">
+                    <img :src="$store.state.appState.walletData.qrCode"/>
+                </div>
+
+                <div class="flex-grow-0 fs-4 p-2" style="word-break: break-all">
+                    {{$store.state.appState.walletData.address}}
+                </div>
+
+                <div class="flex-grow-0 p-2">
+                    <button class="btn btn-large btn-primary" @click="copy()">Copy</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="flex-fill d-flex p-3" style="background-color: #eee; width: 50%">
+            <dl class="">
+                <dt class="">Public key:</dt>
+                <dd class="" style="word-break: break-all">{{$store.state.appState.walletData.publicKey}}</dd>
+                <dt class="">Private key:</dt>
+                <dd class="" style="word-break: break-all">{{$store.state.appState.walletData.privateKey}}</dd>
+            </dl>
+        </div>
+    </div>
+</template>
+
+<script>
+import {ipcRenderer} from "electron";
+
+export default {
+    name: "Info.vue",
+    methods: {
+        copy() {
+            ipcRenderer.send('clipboard-copy', this.$store.state.appState.walletData.address)
+        }
+    }
+}
+</script>
+
+<style scoped>
+
+</style>

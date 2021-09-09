@@ -1,18 +1,26 @@
 <template>
-    <form>
-        <div class="form-group">
-            <label>Wallet password</label>
-            <input class="form-control" type="password" v-model="password">
+    <div class="d-flex flex-column flex-fill">
+
+        <div class="flex-grow-0 p-3">
+            <div class="fs-5">Encrypt</div>
+            <div class="fs-7 text-muted">Encrypt wallet to prevent access to private key</div>
         </div>
-        <div class="form-group">
-            <label>Repeat password</label>
-            <input class="form-control" type="password" v-model="password2">
+
+        <form class="row flex-grow-1 d-flex align-content-start p-3">
+            <div class="form-group mb-2">
+                <label class="fs-6 mb-2">Wallet password</label>
+                <input class="form-control" type="password" v-model="password">
+            </div>
+            <div class="form-group">
+                <label class="fs-6 mb-2">Repeat password</label>
+                <input class="form-control" type="password" v-model="password2">
+            </div>
+        </form>
+        <div class="flex-grow-0 p-3">
+            <button type="button" class="btn btn-large btn-primary me-2" @click="encryptWallet()">Create</button>
+            <button type="button" class="btn btn-large btn-outline-secondary" @click="closeEncrypt()">Cancel</button>
         </div>
-        <div class="form-actions">
-            <button type="button" class="btn btn-form btn-primary" @click="encryptWallet()">Create</button>
-            <button type="button" class="btn btn-form btn-default" @click="closeEncrypt()">Cancel</button>
-        </div>
-    </form>
+    </div>
 </template>
 
 <script>

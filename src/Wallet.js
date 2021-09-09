@@ -5,13 +5,12 @@ const fs = require("fs");
 const cryptoUtil = require("./utils/cryptoUtil");
 const App = require("./App");
 const AppMenu = require("./AppMenu");
-const https = require("https")
 const app = require("electron").app
-const net = require('electron').net
 const dialog = require('electron').dialog
-const axios = require('./utils/Axios')
+const Axios = require('./utils/Axios')
+const QRCode = require('qrcode')
 
-let walletData = App.walletData
+let walletData = App.state.walletData
 
 function enableMenuItem(id, enabled) {
     let menuItem = AppMenu.findMenuItem(id)
@@ -35,10 +34,12 @@ async function loadWallet() {
             walletData.address = cryptoUtil.getAddress(walletData.publicKey)
             walletData.opened = true
             enableMenuItem('encrypt', true)
+            enableMenuItem('decrypt', false)
         } else {
             walletData.encrypted=true
             walletData.opened = !!walletData.privateKey
             enableMenuItem('decrypt', true)
+            enableMenuItem('encrypt', false)
         }
     } else {
         enableMenuItem('encrypt', true)
@@ -51,7 +52,7 @@ async function loadWallet() {
         let readCnt = fs.readFileSync(walletFile, 'utf-8')
         if(readCnt !== str) {
             App.updateStatus(null)
-            dialog.showErrorBox('Error', 'Error while creating wallet!')
+            App.showError('Error while creating wallet!')
             app.quit()
         }
 
@@ -66,30 +67,51 @@ async function loadWallet() {
     }
     if(walletData.address) {
         await setWalletBalance()
+        await setMempoolBalance()
+        await checkAddress()
+        await getQrCode()
     }
     await getPeerInfo()
     App.updateStatus('Wallet loaded')
     AppMenu.loadMenu()
-    console.log(walletData)
 }
 
-function setWalletPeer() {
-    console.log("call setWalletPeer")
-    return new Promise(resolve => {
-        let peersUrl = 'https://node1.testnet.phpcoin.net/peers.php'
-        axios.get(peersUrl).then(peerList => {
-            console.log("peerList", peerList)
-            let arr = peerList.split('\n')
-            arr = arr.filter(i => {return i.length > 0})
-            let len = arr.length
-            let num = Math.round(Math.random()*len)
-            walletData.walletPeer = arr[num]
-            walletData.walletPeer = 'https://spectre:8000'
-            console.log(`set wallet peer: `,walletData.walletPeer)
-            App.updateUi()
-            resolve()
-        })
-    })
+async function getQrCode() {
+    console.log("getQrCode", walletData.address)
+    if(walletData.address) {
+        let imageData = await QRCode.toDataURL(walletData.address, {margin:0, width: 200})
+        walletData.qrCode = imageData
+    }
+}
+
+async function checkAddress() {
+    let url = `${walletData.walletPeer}/api.php?q=getPublicKey&address=${walletData.address}`
+    try {
+        let publicKey = await peerGet(url)
+        console.log('checkAddress', url, publicKey, walletData.publicKey)
+        if(publicKey === walletData.publicKey) {
+            walletData.verifiedAddress = true
+        }
+    } catch (e) {
+        console.log(e)
+    }
+    enableMenuItem('verify_address', !walletData.verifiedAddress)
+    AppMenu.loadMenu()
+}
+
+async function setWalletPeer() {
+    let peersUrl = App.config.peersUrl
+    console.log("call setWalletPeer", peersUrl, App.config)
+    let peerList = await Axios.get(peersUrl)
+    console.log("peerList", peerList)
+    let arr = peerList.split('\n')
+    arr = arr.filter(i => {return i.length > 0})
+    let len = arr.length
+    let num = Math.floor(Math.random()*len)
+    walletData.walletPeer = arr[num]
+    console.log(`set wallet peer: `,walletData.walletPeer)
+    await getPeerInfo()
+    App.updateState()
 }
 
 function setWalletBalance() {
@@ -97,6 +119,15 @@ function setWalletBalance() {
     console.log("getPendingBalance url",url)
     return peerGet(url).then(balance => {
         walletData.balance = balance
+    })
+}
+
+function setMempoolBalance() {
+    let url = `${walletData.walletPeer}/api.php?q=getMempoolBalance&address=${walletData.address}`
+    console.log("setMempoolBalance", url)
+    return peerGet(url).then(balance => {
+        console.log("setMempoolBalance", balance)
+        walletData.mempoolBalance = balance
     })
 }
 
@@ -109,10 +140,8 @@ function getPeerInfo() {
 }
 
 let peerGet = (url) => {
-    // console.log("call peerGet", url)
     return new Promise((resolve, reject)=>{
-        axios.get(url).then(res => {
-            // console.log("peerGet response", res)
+        Axios.get(url).then(res => {
             if(res.status === 'ok') {
                 resolve(res.data)
             } else {
@@ -128,8 +157,8 @@ let peerGet = (url) => {
 let peerPost = (url, data) => {
     console.log("call peerPost", url)
     return new Promise((resolve, reject)=>{
-        axios.post(url, data).then(res => {
-            console.log("peerPost response", res)
+        Axios.post(url, data).then(res => {
+            // console.log("peerPost response", res)
             if(res.status === 'ok') {
                 resolve(res.data)
             } else {
@@ -154,11 +183,11 @@ function openLoginLink() {
     console.log("loginCode", loginCode)
     let signature = cryptoUtil.sign(loginCode, cryptoUtil.privateKeyToPem(walletData.privateKey))
     if(!signature) {
-        dialog.showErrorBox("Error", "Error generating login link!")
+        App.showError("Error generating login link!")
         return
     }
     if(!walletData.walletPeer) {
-        dialog.showErrorBox("Error", "Could not connect to remote peer!")
+        App.showError( "Could not connect to remote peer!")
         return
     }
     console.log("signature", signature)
@@ -169,15 +198,16 @@ function openLoginLink() {
 
 async function getPendingBalance() {
     let url = `${walletData.walletPeer}/api.php?q=getBalance&address=${walletData.address}`
-    let res = await axios.get(url)
+    let res = await Axios.get(url)
     console.log("call wallet getPendingBalance", url, res)
     return res.data
 }
 async function getTransactions() {
-    let url = `${walletData.walletPeer}/api.php?q=getTransactions&address=${walletData.address}`
-    let res = await axios.get(url)
-    console.log("call wallet getTransactions", url, res)
-    return res.data
+    if(walletData.address) {
+        let url = `${walletData.walletPeer}/api.php?q=getTransactions&address=${walletData.address}`
+        let res = await Axios.get(url)
+        App.state.transactions = res.data
+    }
 }
 
 async function send(arg) {
@@ -189,6 +219,15 @@ async function send(arg) {
     let fee = 0
 
     try {
+
+        if(!arg.address) {
+            throw new Error('Address must be entered')
+        }
+
+        if(!amount || amount <=0) {
+            throw new Error('Amount is invalid')
+        }
+
         let balance = await peerGet(url)
         balance = Number(balance)
 
@@ -196,10 +235,14 @@ async function send(arg) {
             throw new Error('Not enough funds in balance')
         }
 
+        let msg =''
+        if(arg.message) {
+            msg = arg.message.trim()
+        }
+
         amount = Number(amount).toFixed(8)
         fee = Number(fee).toFixed(8)
-        let dst = arg.address
-        let msg = arg.message
+        let dst = arg.address.trim()
         let type = 1
         let publicKey = walletData.publicKey
         let date = Math.round(new Date().getTime()/1000)
@@ -223,13 +266,15 @@ async function send(arg) {
 
         let tx = await peerPost(url, {data: JSON.stringify(data)})
 
+        await refresh()
+
         dialog.showMessageBoxSync(win, {type:'info', title:'Success', message:'Your transaction is created'})
         return tx
 
 
     } catch (e) {
         console.error("error in wallet-send", e)
-        dialog.showErrorBox('Error', e.message)
+        App.showError(e.message)
         return false
     }
 }
@@ -329,6 +374,21 @@ async function decryptWallet() {
     return true
 }
 
+async function refresh() {
+    await setWalletBalance()
+    await setMempoolBalance()
+    await getTransactions()
+    await getPeerInfo()
+    App.updateState()
+}
+
+async function getPeers() {
+    let url = `${walletData.walletPeer}/api.php?q=getPeers`
+    let res = await Axios.get(url)
+    console.log("call wallet getPeers", url, res)
+    return res.data
+}
+
 export {
     loadWallet,
     deleteWallet,
@@ -341,5 +401,11 @@ export {
     send,
     encryptWallet,
     openWallet,
-    decryptWallet
+    decryptWallet,
+    refresh,
+    getQrCode,
+    setWalletBalance,
+    getPeerInfo,
+    getPeers,
+    setMempoolBalance
 }
