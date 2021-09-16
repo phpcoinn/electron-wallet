@@ -12,6 +12,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
+    "electron:build-win": "vue-cli-service electron:build --win",
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "NETWORK=testnet vue-cli-service electron:serve",
     "electron:debug": "vue-cli-service electron:serve --debug",
