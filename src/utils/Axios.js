@@ -50,6 +50,9 @@ function post(url, postData) {
 
             })
         })
+        // request.on('error', err => {
+        //     console.log("Error", err)
+        // })
         request.write(postData)
         request.end()
     })

@@ -105,7 +105,7 @@ const template = [
             {
                 label: "Receive",
                 click() {
-                    App.goto( "/receive")
+                    App.goto( "/info")
                 }
             },
             {

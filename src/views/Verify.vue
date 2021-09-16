@@ -7,6 +7,8 @@
             <div class="fs-7 text-muted">Verify your address to start mining</div>
         </div>
 
+        <hr class="mx-3 my-0"/>
+
         <div class="flex-grow-1 d-flex align-content-start p-3">
             <ol>
                 <li>Go to <a href="" @click.prevent="openFaucet">faucet</a>,

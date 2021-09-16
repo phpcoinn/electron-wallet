@@ -6,6 +6,8 @@
             <div class="fs-7 text-muted">Modify settings of wallet</div>
         </div>
 
+        <hr class="mx-3 my-0"/>
+
         <form class="row flex-grow-1 d-flex align-content-start p-3">
             <div class="row mb-3">
                 <label for="miningNode" class="col-sm-2 col-form-label">Mining node:</label>
@@ -48,6 +50,10 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style>
+@media (max-width: 600px) {
+    /*.top-bar {*/
+    /*    flex-direction: column;*/
+    /*}*/
+}
 </style>

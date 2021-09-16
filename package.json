@@ -1,12 +1,18 @@
 {
-  "name": "electron-wallet",
-  "version": "0.1.0",
+  "name": "phpcoin-wallet",
+  "description": "GUI Wallet for PHPCoin",
+  "author": {
+    "email": "phpcoinn@gmail.com",
+    "name": "PHPCoin",
+    "url": "https://phpcoin.net"
+  },
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "electron:build": "vue-cli-service electron:build --win",
+    "electron:build": "vue-cli-service electron:build",
     "electron:serve": "NETWORK=testnet vue-cli-service electron:serve",
     "electron:debug": "vue-cli-service electron:serve --debug",
     "postinstall": "electron-builder install-app-deps",
@@ -19,8 +25,6 @@
     "base-58": "0.0.1",
     "btoa": "^1.2.1",
     "core-js": "^3.6.5",
-    "crypto": "^1.0.1",
-    "electron-rebuild": "^2.3.5",
     "hex2bin": "^1.0.2",
     "secp256k1": "^4.0.2",
     "starkbank-ecdsa": "^1.1.2",

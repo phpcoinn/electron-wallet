@@ -5,6 +5,9 @@
               <div class="fs-5">Transactions</div>
               <div class="fs-7 text-muted">View your account's history</div>
           </div>
+
+          <hr class="mx-3 my-0"/>
+
           <div class="flex-fill" style="min-height: 0; overflow: auto">
             <template v-for="tx in transactions" >
                 <div :key="tx.id" class="px-3 py-1 d-flex flex-fill border-bottom tx-row" role="button" @click="selTransaction = tx">

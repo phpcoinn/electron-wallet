@@ -6,7 +6,9 @@
             <div class="fs-7 text-muted">Connected nodes on network</div>
         </div>
 
-        <div class="row flex-grow-1 d-flex align-content-start p-3">
+        <hr class="mx-3 my-0"/>
+
+        <div class="row flex-grow-1 d-flex align-content-start p-3 mw-0">
 
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -92,6 +94,3 @@ export default {
 }
 </script>
 
-<style scoped>
-
-</style>

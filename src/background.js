@@ -9,6 +9,7 @@ import * as Wallet from './Wallet'
 import * as AppMenu from "./AppMenu";
 import * as Miner from "./Miner";
 import {win} from "./App";
+import path from 'path'
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -17,11 +18,14 @@ protocol.registerSchemesAsPrivileged([
 
 async function createWindow() {
   // Create the browser window.
+  let icon =  path.resolve(__dirname, '../../electron-wallet.png')
+  console.log("createWindow",icon)
   let win = new BrowserWindow({
-    x:0,
-    y:0,
-    width: 600,
-    height: 400,
+    // x:0,
+    // y:0,
+    width: 1000,
+    height: 600,
+    icon,
     webPreferences: {
       
       // Use pluginOptions.nodeIntegration, leave this alone

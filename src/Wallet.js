@@ -351,6 +351,7 @@ async function openWallet(password) {
     walletData.publicKey = parts[2].trim()
     walletData.address = cryptoUtil.getAddress(walletData.publicKey)
     await loadWallet()
+    await getTransactions()
     return true
 }
 

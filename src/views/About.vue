@@ -6,7 +6,9 @@
             <div class="fs-7 text-muted">Information about wallet</div>
         </div>
 
-        <div class="row flex-grow-1 d-flex align-content-start p-3">
+        <hr class="mx-3 my-0"/>
+
+        <div class="row flex-grow-1 d-flex align-content-start p-3 fs-5">
             <dl>
                <dd>Version</dd>
                <dt>{{info.version}}</dt>

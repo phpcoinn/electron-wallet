@@ -7,10 +7,11 @@
                 <div class="fs-7 text-muted">Here is information about your wallet</div>
             </div>
 
+            <hr class="mx-3 my-0"/>
 
             <div class="flex-fill d-flex flex-column text-center">
-                <div class="flex-grow-1 d-flex justify-content-center p-4">
-                    <img :src="$store.state.appState.walletData.qrCode"/>
+                <div class="flex-grow-1 d-flex justify-content-center p-4 align-items-center">
+                    <img :src="$store.state.appState.walletData.qrCode" style="max-width: 300px; max-height:300px;"/>
                 </div>
 
                 <div class="flex-grow-0 fs-4 p-2" style="word-break: break-all">

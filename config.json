@@ -1,6 +1,7 @@
 {
+    "network": "testnet",
     "testnet": {
-        "miningNode": "https://miner1.testnet.phpcoin.net",
+        "miningNode": "http://miner1.testnet.phpcoin.net",
         "faucetLink": "https://node1.testnet.phpcoin.net/apps/faucet",
         "peersUrl": "https://node1.testnet.phpcoin.net/peers.php",
         "aboutUrl": "https://phpcoin.net",

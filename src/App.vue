@@ -51,16 +51,16 @@
                   </template>
                   <template v-else>
                       <div class="window-header p-3">
-                          <div class="d-flex">
-                              <div class="flex-grow-1">
+                          <div class="d-flex top-bar">
+                              <div class="flex-grow-1 mw-0">
                                   <div class="fs-6 text-secondary">Total</div>
-                                  <div class="fs-4">{{walletData.balance}} PHP</div>
+                                  <div class="fs-4 text-truncate">{{walletData.balance}} PHP</div>
                                   <div class="fs-6 text-secondary">Pending</div>
-                                  <div class="fs-5">{{walletData.mempoolBalance}} PHP</div>
+                                  <div class="fs-5 text-truncate">{{walletData.mempoolBalance}} PHP</div>
                               </div>
-                              <div class="flex-grow-1">
+                              <div class="flex-grow-1 mw-0">
                                   <div class="fs-6 text-secondary">Address</div>
-                                  <div class="fs-4">
+                                  <div class="fs-4 text-truncate">
                                       <template v-if="walletData.verifiedAddress">
                                           <span class="icon" v-html="Icons.iconVerified" title="Address is verified"></span>
                                       </template>
@@ -75,14 +75,14 @@
                                       {{$store.state.appState.transactions.length}}
                                   </div>
                               </div>
-                              <div class="flex-grow-1">
+                              <div class="flex-grow-1 mw-0">
                                   <div class="fs-6 text-secondary">Node</div>
-                                  <div class="fs-4">{{walletData.walletPeer}}</div>
+                                  <div class="fs-4 text-truncate">{{walletData.walletPeer}}</div>
                                   <div class="fs-6 text-secondary">Blocks</div>
                                   <div class="fs-5">{{walletData.peerInfo.height}}</div>
                               </div>
                               <div class="">
-                                  <img :src="walletData.qrCode" style="width: 114px; height: 114px"/>
+                                  <img :src="walletData.qrCode" style="width: 80px; height: 80px"/>
                               </div>
                           </div>
                       </div>
@@ -168,6 +168,12 @@
 </script>
 
 <style>
+html {
+    font-size: 12px;
+}
+.mw-0 {
+    min-width: 0;
+}
 .window {
     display: flex;
     flex-direction: row;
@@ -242,8 +248,19 @@
     padding: 5px;
 }
 
-.icon svg {
-    width: 30px;
-    height: 30px;
+.max-width-600 {
+    max-width: 600px;
+}
+
+/*.icon svg {*/
+/*    width: 30px;*/
+/*    height: 30px;*/
+/*}*/
+
+
+@media (max-width: 800px) {
+    /*.top-bar {*/
+    /*    flex-direction: column;*/
+    /*}*/
 }
 </style>

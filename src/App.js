@@ -3,13 +3,13 @@ import { exec } from "child_process";
 
 const fs = require("fs")
 const path = require("path")
-console.log("load module App" ,global.test)
 
 let packageJson = require("../package.json")
 
-let network = process.env.NETWORK
-console.log("network",network)
+
 let config = require("../config.json")
+let network = config.network
+console.log("network",network)
 config = config[network]
 
 let state = {

@@ -1,14 +1,16 @@
 <template>
     <div class="d-flex flex-row flex-fill">
 
-        <div class="d-flex flex-fill flex-column" style="width: 50%">
+        <div class="d-flex flex-fill flex-column">
 
             <div class="flex-grow-0 p-3">
                 <div class="fs-5">Send</div>
                 <div class="fs-7 text-muted">Send PHPCoin to other address</div>
             </div>
 
-            <div class="d-flex flex-fill p-3 flex-column">
+            <hr class="mx-3 my-0"/>
+
+            <div class="d-flex flex-fill p-3 flex-column max-width-600">
 
                 <form class="row flex-grow-1 d-flex align-content-start">
                     <div class="col-8">
@@ -38,9 +40,6 @@
                 </div>
 
             </div>
-        </div>
-        <div class="flex-fill d-flex" style="background-color: #eee; width: 50%">
-
         </div>
 
     </div>

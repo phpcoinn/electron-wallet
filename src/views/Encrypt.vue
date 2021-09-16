@@ -6,7 +6,9 @@
             <div class="fs-7 text-muted">Encrypt wallet to prevent access to private key</div>
         </div>
 
-        <form class="row flex-grow-1 d-flex align-content-start p-3">
+        <hr class="mx-3 my-0"/>
+
+        <form class="row flex-grow-1 d-flex align-content-start p-3 max-width-600">
             <div class="form-group mb-2">
                 <label class="fs-6 mb-2">Wallet password</label>
                 <input class="form-control" type="password" v-model="password">
