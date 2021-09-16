@@ -1,0 +1,9 @@
+{
+  "appId": "net.phpcoin.electronwallet",
+  "win": {
+    "target": "portable"
+  },
+  "linux": {
+    "target": "AppImage"
+  }
+}
