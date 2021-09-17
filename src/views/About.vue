@@ -18,6 +18,10 @@
                <dt>{{info.gitCommit}}</dt>
             </dl>
             <dl>
+               <dd>Wallet file</dd>
+               <dt>{{$store.state.appState.walletData.file}}</dt>
+            </dl>
+            <dl>
                 <dd>Network</dd>
                 <dt>{{info.network}}</dt>
             </dl>

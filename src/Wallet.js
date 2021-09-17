@@ -21,7 +21,8 @@ function enableMenuItem(id, enabled) {
 
 async function loadWallet() {
     console.log("call load-wallet")
-    walletData.file = process.cwd() + "/phpcoin.dat"
+    let walletDir = app.getPath('home');
+    walletData.file = walletDir + "/phpcoin.dat"
     let walletFile = walletData.file
     if(fs.existsSync(walletFile)) {
         walletData.exists = true
