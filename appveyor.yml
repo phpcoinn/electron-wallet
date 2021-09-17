@@ -12,7 +12,7 @@ init:
 
 install:
   - ps: Install-Product node 14 x64
-  - npm
+  - npm i
 
 build_script:
   - npm run electron:build-win
