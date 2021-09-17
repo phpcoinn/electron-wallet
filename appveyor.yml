@@ -12,9 +12,9 @@ init:
 
 install:
   - ps: Install-Product node 14 x64
-  - yarn
+  - npm
 
 build_script:
-  - yarn dist
+  - npm run electron:build-win
 
 test: off
