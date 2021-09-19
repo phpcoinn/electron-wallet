@@ -76,7 +76,6 @@ app.on('ready', async () => {
   await createWindow()
 
   App.loadSettings()
-  App.loadInfo()
 
   App.updateStatus('Loading wallet...')
   await Wallet.setWalletPeer()

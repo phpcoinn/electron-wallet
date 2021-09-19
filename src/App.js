@@ -4,9 +4,6 @@ import { exec } from "child_process";
 const fs = require("fs")
 const path = require("path")
 
-let packageJson = require("../package.json")
-
-
 let config = require("../config.json")
 let network = config.network
 console.log("network",network)
@@ -54,7 +51,6 @@ let state = {
     },
     info: {
         version: null,
-        gitCommit: null,
         network: network
     },
     config
@@ -100,20 +96,6 @@ function updateState() {
     win.webContents.send("state-update", state)
 }
 
-function loadInfo() {
-    state.info.version = packageJson.version
-    let cmd = `cd ${process.cwd()} && git rev-parse HEAD`
-    exec(cmd, (error, data, getter) => {
-        if(error){
-            return;
-        }
-        if(getter){
-            return;
-        }
-        state.info.gitCommit = data
-    });
-}
-
 export {
     win,
     setWin,
@@ -124,6 +106,5 @@ export {
     showError,
     state,
     updateState,
-    loadInfo,
     config
 }
