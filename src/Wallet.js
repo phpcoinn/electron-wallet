@@ -377,6 +377,7 @@ async function decryptWallet() {
 }
 
 async function refresh() {
+    await checkAddress()
     await setWalletBalance()
     await setMempoolBalance()
     await getTransactions()
