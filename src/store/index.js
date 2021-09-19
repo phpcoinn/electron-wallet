@@ -6,6 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     appState: {},
+    gitRev: process.env.GIT_REV
   },
   mutations: {
   },

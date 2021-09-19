@@ -15,7 +15,7 @@
             </dl>
             <dl>
                <dd>Github version</dd>
-               <dt>{{info.gitCommit}}</dt>
+               <dt>{{info.gitCommit}} - {{$store.state.gitRev}}</dt>
             </dl>
             <dl>
                <dd>Wallet file</dd>
