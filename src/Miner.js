@@ -222,6 +222,8 @@ async function loop() {
             elapsed
         }
 
+
+
         console.log("postData", App.state.settings.miningNode)
         let response = await Axios.post(App.state.settings.miningNode + '/mine.php?q=submitHash', postData)
         if(response.status === 'ok') {

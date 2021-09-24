@@ -16,6 +16,14 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 
+process.on('uncaughtException', function (error) {
+  dialog.showErrorBox('Something bad happened', error.stack)
+})
+
+process.on('unhandledRejection', function(err) {
+  dialog.showErrorBox('Something bad happened', err.stack)
+});
+
 async function createWindow() {
   // Create the browser window.
   let icon =  path.resolve(__dirname, '../../electron-wallet.png')

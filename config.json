@@ -1,14 +1,14 @@
 {
     "network": "testnet",
     "testnet": {
-        "miningNode": "http://miner1.testnet.phpcoin.net",
+        "miningNode": "https://miner1.testnet.phpcoin.net",
         "faucetLink": "https://node1.testnet.phpcoin.net/apps/faucet",
         "peersUrl": "https://node1.testnet.phpcoin.net/peers.php",
         "aboutUrl": "https://phpcoin.net",
         "block_time": 30
     },
     "mainnet": {
-        "miningNode": "https://miner.phpcoin.net",
+        "miningNode": "https://miner1.phpcoin.net",
         "faucetLink": "https://faucet.phpcoin.net/apps/faucet",
         "peersUrl": "https://peers.phpcoin.net/peers.php",
         "aboutUrl": "https://phpcoin.net",
