@@ -192,7 +192,7 @@ function openLoginLink() {
         return
     }
     console.log("signature", signature)
-    let url = `${walletData.walletPeer}/apps/wallet/login.php?action=login-link&login_code=${loginCode}&public_key=${walletData.publicKey}&login_key=${signature}`
+    let url = `${App.config.walletUrl}/apps/wallet/login.php?action=login-link&login_code=${loginCode}&public_key=${walletData.publicKey}&login_key=${signature}`
     console.log("url", url)
     shell.openExternal(url)
 }

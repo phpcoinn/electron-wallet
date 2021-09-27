@@ -5,6 +5,7 @@
         "faucetLink": "https://node1.testnet.phpcoin.net/apps/faucet",
         "peersUrl": "https://node1.testnet.phpcoin.net/peers.php",
         "aboutUrl": "https://phpcoin.net",
+        "walletUrl": "https://wallet.testnet.phpcoin.net",
         "block_time": 30
     },
     "mainnet": {
@@ -12,6 +13,7 @@
         "faucetLink": "https://faucet.phpcoin.net/apps/faucet",
         "peersUrl": "https://peers.phpcoin.net/peers.php",
         "aboutUrl": "https://phpcoin.net",
+        "walletUrl": "https://wallet.phpcoin.net",
         "block_time": 60
     }
 }
