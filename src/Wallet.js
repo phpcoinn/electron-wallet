@@ -231,6 +231,7 @@ async function send(arg) {
 
         let balance = await peerGet(url)
         balance = Number(balance)
+        amount = Number(amount)
 
         if(balance < amount + fee) {
             throw new Error('Not enough funds in balance')
