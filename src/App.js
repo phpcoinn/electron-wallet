@@ -5,6 +5,8 @@ const fs = require("fs")
 const path = require("path")
 
 let config = require("../config.json")
+let pckg = require("../package.json")
+let version = pckg.version
 let network = config.network
 console.log("network",network)
 config = config[network]
@@ -50,7 +52,7 @@ let state = {
         }
     },
     info: {
-        version: null,
+        version: version,
         network: network
     },
     config
