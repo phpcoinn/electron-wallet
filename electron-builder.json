@@ -1,5 +1,6 @@
 {
   "appId": "net.phpcoin.electronwallet",
+  "artifactName": "${name}.${ext}",
   "win": {
     "target": "portable"
   },
