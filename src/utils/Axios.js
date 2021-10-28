@@ -34,7 +34,7 @@ function get(url) {
 }
 
 function post(url, postData) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         postData = new URLSearchParams(postData).toString()
         console.log("Calling post", postData)
         let request = net.request({
@@ -50,9 +50,9 @@ function post(url, postData) {
 
             })
         })
-        // request.on('error', err => {
-        //     console.log("Error", err)
-        // })
+        request.on('error', err => {
+            reject(err)
+        })
         request.write(postData)
         request.end()
     })

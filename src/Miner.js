@@ -225,14 +225,24 @@ async function loop() {
 
 
         console.log("postData", App.state.settings.miningNode)
-        let response = await Axios.post(App.state.settings.miningNode + '/mine.php?q=submitHash', postData)
-        if(response.status === 'ok') {
-            minerData.miningStat.accepted ++
-            await Wallet.refresh()
+        let response
+        try {
+            response = await Axios.post(App.state.settings.miningNode + '/mine.php?q=submitHash', postData)
+        } catch (e) {
+            console.error("ERROR",e)
+        }
+        if(response) {
+            if(response.status === 'ok') {
+                minerData.miningStat.accepted ++
+                await Wallet.refresh()
+            } else {
+                console.log(JSON.stringify(response))
+                minerData.miningStat.rejected ++
+                minerData.miningStat.rejectedReason = response.data
+            }
         } else {
-            console.log(JSON.stringify(response))
             minerData.miningStat.rejected ++
-            minerData.miningStat.rejectedReason = response.data
+            minerData.miningStat.rejectedReason = "NO_RESPONSE"
         }
         submitResponse = response
         minerData.miner.submitResponse = submitResponse
