@@ -3,6 +3,9 @@ const Base58 = require("base-58")
 const crypto = require("crypto");
 const Ecdsa = ellipticcurve.Ecdsa;
 const PrivateKey = ellipticcurve.PrivateKey;
+const config = require("../../config.json")
+let network = config.network
+let network_prefix = config[network].network_prefix
 
 let pem2coin = (pem) => {
     let pemB58 = pem.replace('-----BEGIN EC PRIVATE KEY-----','')
@@ -18,7 +21,7 @@ let pem2coin = (pem) => {
 let getAddress = (pubkey) => {
     let hash1 = crypto.createHash('sha256').update(pubkey).digest('hex');
     let hash2 = crypto.createHash('ripemd160').update(hash1).digest('hex');
-    let baseAddress = "30" + hash2
+    let baseAddress = network_prefix + hash2
     let checksumCalc1 = crypto.createHash('sha256').update(baseAddress).digest('hex')
     let checksumCalc2 = crypto.createHash('sha256').update(checksumCalc1).digest('hex')
     let checksumCalc3 = crypto.createHash('sha256').update(checksumCalc2).digest('hex')

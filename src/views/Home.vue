@@ -12,16 +12,16 @@
             <template v-for="tx in transactions" >
                 <div :key="tx.id" class="px-3 py-1 d-flex flex-fill border-bottom tx-row" role="button" @click="selTransaction = tx">
                     <div class="p-2 d-flex align-items-center">
-                        <span class="tx-icon text-success" v-html="Icons.iconReceive" v-if="tx.type==='credit'"></span>
-                        <span class="tx-icon text-danger" v-html="Icons.iconSend" v-if="tx.type==='debit'"></span>
-                        <span class="tx-icon text-success" v-html="Icons.iconMiner" v-if="tx.type==='mining'"></span>
-                        <span class="tx-icon text-warning" v-html="Icons.iconMempool" v-if="tx.type==='mempool'"></span>
+                        <span class="tx-icon text-success" v-html="Icons.iconReceive" v-if="tx.type_label==='credit'"></span>
+                        <span class="tx-icon text-danger" v-html="Icons.iconSend" v-if="tx.type_label==='debit'"></span>
+                        <span class="tx-icon text-success" v-html="Icons.iconMiner" v-if="tx.type_label==='mining'"></span>
+                        <span class="tx-icon text-warning" v-html="Icons.iconMempool" v-if="tx.type_label==='mempool'"></span>
                     </div>
                     <div class="flex-grow-1 p-2">
-                        <div class="fs-6" v-if="tx.type==='credit'">Received from {{tx.src}}</div>
-                        <div class="fs-6" v-if="tx.type==='debit'">Send to {{tx.dst}}</div>
-                        <div class="fs-6" v-if="tx.type==='mining'">Mined from {{tx.src}}</div>
-                        <div class="fs-6" v-if="tx.type==='mempool'">Pending transaction</div>
+                        <div class="fs-6" v-if="tx.type_label==='credit'">Received from {{tx.src}}</div>
+                        <div class="fs-6" v-if="tx.type_label==='debit'">Send to {{tx.dst}}</div>
+                        <div class="fs-6" v-if="tx.type_label==='mining'">Mined from {{tx.src}}</div>
+                        <div class="fs-6" v-if="tx.type_label==='mempool'">Pending transaction</div>
                         <div class="text-muted small">{{tx.date|df}}</div>
                     </div>
                     <div class="tx-val d-flex align-items-center p-2 fs-5">
@@ -54,7 +54,7 @@
                     <dt class="col-sm-3">Date</dt>
                     <dd class="col-sm-9">{{selTransaction.date|df}}</dd>
                     <dt class="col-sm-3">Type</dt>
-                    <dd class="col-sm-9">{{selTransaction.type}}</dd>
+                    <dd class="col-sm-9">{{selTransaction.type_label}}</dd>
                     <dt class="col-sm-3">Source</dt>
                     <dd class="col-sm-9" style="word-break: break-all">{{selTransaction.public_key}}</dd>
                     <dt class="col-sm-3">Destination</dt>

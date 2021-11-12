@@ -1,5 +1,6 @@
 import {win} from "@/App";
 import {shell} from "electron";
+import config from "../config.json";
 
 const fs = require("fs");
 const cryptoUtil = require("./utils/cryptoUtil");
@@ -12,6 +13,8 @@ const QRCode = require('qrcode')
 
 let walletData = App.state.walletData
 
+let version = config.version
+
 function enableMenuItem(id, enabled) {
     let menuItem = AppMenu.findMenuItem(id)
     if(menuItem) {
@@ -20,9 +23,9 @@ function enableMenuItem(id, enabled) {
 }
 
 async function loadWallet() {
-    console.log("call load-wallet")
     let walletDir = app.getPath('home');
     walletData.file = walletDir + "/phpcoin.dat"
+    console.log("call load-wallet file="+walletData.file)
     let walletFile = walletData.file
     if(fs.existsSync(walletFile)) {
         walletData.exists = true
@@ -134,7 +137,7 @@ function setMempoolBalance() {
 
 function getPeerInfo() {
     let url = `${walletData.walletPeer}/peer.php?q=currentBlock`
-    return peerPost(url, `coin=phpcoin`).then(res=>{
+    return peerPost(url, `coin=phpcoin&version=${version}`).then(res=>{
         walletData.peerInfo = res.info
     })
 
@@ -207,6 +210,7 @@ async function getTransactions() {
     if(walletData.address) {
         let url = `${walletData.walletPeer}/api.php?q=getTransactions&address=${walletData.address}`
         let res = await Axios.get(url)
+        // console.log(App.state.transactions)
         App.state.transactions = res.data
     }
 }

@@ -1,19 +1,22 @@
 {
     "network": "mainnet",
+    "version": "1.0.0",
     "testnet": {
         "miningNode": "https://miner1.testnet.phpcoin.net",
         "faucetLink": "https://node1.testnet.phpcoin.net/apps/faucet",
         "peersUrl": "https://node1.testnet.phpcoin.net/peers.php",
         "aboutUrl": "https://phpcoin.net",
         "walletUrl": "https://wallet.testnet.phpcoin.net",
-        "block_time": 30
+        "block_time": 30,
+        "network_prefix": "30"
     },
     "mainnet": {
         "miningNode": "https://miner1.phpcoin.net",
         "faucetLink": "https://faucet.phpcoin.net/apps/faucet",
-        "peersUrl": "https://peers.phpcoin.net/peers.php",
+        "peersUrl": "https://node1.phpcoin.net/peers.php",
         "aboutUrl": "https://phpcoin.net",
         "walletUrl": "https://wallet.phpcoin.net",
-        "block_time": 60
+        "block_time": 60,
+        "network_prefix": "38"
     }
 }
