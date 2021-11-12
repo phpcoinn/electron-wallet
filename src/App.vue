@@ -146,7 +146,7 @@
             console.log("mounted app")
 
             ipcRenderer.on('state-update', (event, state)=>{
-                console.log("state-update", state)
+                //console.log("state-update", state)
                 this.$store.state.appState = state
             })
 
