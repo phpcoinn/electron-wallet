@@ -17,7 +17,7 @@ function getResponse(response, data) {
 
 function get(url) {
     // console.log("call axios get ", url)
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         const request = net.request(url)
         let out = ''
         request.on('response', (response) => {
@@ -28,6 +28,9 @@ function get(url) {
                 // console.log('request ended')
                 resolve(getResponse(response, out))
             })
+        })
+        request.on('error', (err)=> {
+            reject(err)
         })
         request.end()
     })

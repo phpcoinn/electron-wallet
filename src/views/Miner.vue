@@ -4,7 +4,7 @@
             <div class="flex-grow-0 p-3 d-flex flex-row justify-content-between">
                 <div class="">
                     <div class="fs-5">Miner node:</div>
-                    <div class="fs-7 text-muted">{{$store.state.appState.settings.miningNode}}</div>
+                    <div :class="`fs-7 ${minerData.miningStat.nodeStatus ? 'text-success' : 'text-danger'}`">{{$store.state.appState.settings.miningNode}}</div>
                 </div>
                 <div>
                     <button @click="startMiner" class="btn btn-large btn-success fs-5 mt-2 me-2"

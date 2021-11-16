@@ -49,6 +49,7 @@ let state = {
             rejected: 0,
             rejectedReason: null,
             dropped: 0,
+            nodeStatus: null
         }
     },
     info: {
