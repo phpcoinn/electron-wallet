@@ -86,7 +86,7 @@ async function loop() {
             let data = info.data
             let block = info.block
             let offset = nodeTime - now
-            let elapsed
+            let elapsed = 0
             let new_block_date
             let argonBase
             let height = parseInt(info.height) + 1
@@ -212,7 +212,7 @@ async function loop() {
                 updateUi()
             }
 
-            if (!blockFound) {
+            if (!blockFound || elapsed<=0) {
                 continue
             }
 
