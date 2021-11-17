@@ -50,7 +50,8 @@ let state = {
             rejectedReason: null,
             dropped: 0,
             nodeStatus: null
-        }
+        },
+        logs: []
     },
     info: {
         version: version,

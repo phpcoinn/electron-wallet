@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex flex-row flex-fill">
-        <div class="d-flex flex-fill flex-column max-width-600">
+        <div class="d-flex flex-fill flex-column col-8">
             <div class="flex-grow-0 p-3 d-flex flex-row justify-content-between">
                 <div class="">
                     <div class="fs-5">Miner node:</div>
@@ -15,7 +15,7 @@
 
             <hr class="mx-3 my-0"/>
 
-            <div class="d-flex flex-fill p-3 flex-column max-width-600">
+            <div class="d-flex flex-fill p-3 flex-column">
 
 
                 <template v-if="!$store.state.appState.walletData.verifiedAddress">
@@ -178,6 +178,37 @@
                     </template>
                 </template>
             </div>
+
+
+        </div>
+        <div class="d-flex flex-fill p-3 flex-column overflow-auto col-4">
+            <div class="flex-grow-0 p-3 d-flex flex-row justify-content-between mt-0 pt-0">
+                <div class="">
+                    <div class="fs-5">Miner log:</div>
+                </div>
+                <div>
+                    <button @click="clearLog" class="btn btn-large btn-danger fs-5 mt-2" :disabled="!minerData.running">Clear</button>
+                </div>
+            </div>
+            <div>
+                <hr class="mx-0 my-0 mb-3"/>
+            </div>
+            <template v-for="(log, ix) in minerData.logs">
+                <div :key="ix" :class="`alert alert-${log.type} d-flex flex-row justify-content-between align-items-center py-1 px-2`">
+                    <div class="flex-grow-0 me-2">
+                        <span class="icon" v-html="Icons.iconDanger" v-if="log.type==='danger'"></span>
+                        <span class="icon" v-html="Icons.iconWarning" v-if="log.type==='warning'"></span>
+                        <span class="icon" v-html="Icons.iconVerified" v-if="log.type==='success'"></span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">{{log.title}}</div>
+                        <div>{{log.message}}</div>
+                    </div>
+                    <div class="text-end">
+                        <span style="cursor: pointer" :title="date(log.time)">{{elapsed(log.time)}} ago</span>
+                    </div>
+                </div>
+            </template>
         </div>
 
     </div>
@@ -186,6 +217,7 @@
 <script>
 import {ipcRenderer} from "electron";
 import moment from "moment";
+import * as Icons from "../utils/Icons"
 
 export default {
     name: "Miner",
@@ -208,9 +240,24 @@ export default {
         },
         openSend() {
             this.$router.push('/send')
+        },
+        elapsed(t) {
+            return moment.duration(Date.now() - t).humanize()
+        },
+        date(t) {
+            return moment(t).format('ll LTS')
+        },
+        clearLog() {
+            if(!confirm('Clear log?')) {
+                return
+            }
+            ipcRenderer.send('miner-cmd', 'clearLog')
         }
     },
     computed: {
+        Icons() {
+            return Icons
+        },
         minerData() {
           return this.$store.state.appState.minerData
         },
@@ -261,6 +308,9 @@ export default {
         },
         runningTimeHuman() {
             return moment.duration(this.minerData.miner.runningTime).humanize()
+        },
+        logs() {
+            return this.minerData().logs.slice(0, 100)
         }
     }
 

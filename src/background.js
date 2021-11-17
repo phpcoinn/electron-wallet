@@ -17,11 +17,12 @@ protocol.registerSchemesAsPrivileged([
 ])
 
 process.on('uncaughtException', function (error) {
-  dialog.showErrorBox('Something bad happened', error.stack)
+  dialog.showErrorBox('Uncaught exception', error.stack)
 })
 
 process.on('unhandledRejection', function(err) {
-  dialog.showErrorBox('Something bad happened', err.stack)
+  console.log(err)
+  dialog.showErrorBox('Unhandled rejection', err.stack)
 });
 
 async function createWindow() {
@@ -85,19 +86,25 @@ app.on('ready', async () => {
 
   App.loadSettings()
 
-  App.updateStatus('Loading wallet...')
-  await Wallet.setWalletPeer()
+  try {
+    App.updateStatus('Loading wallet...')
+    await Wallet.setWalletPeer()
 
-  await Wallet.loadWallet()
-  await Wallet.getTransactions()
+    await Wallet.loadWallet()
+    await Wallet.getTransactions()
 
-  App.state.walletData.loaded = true
-  App.updateStatus(null)
-  win.webContents.send("wallet-loaded")
+    App.state.walletData.loaded = true
+    App.updateStatus(null)
+    win.webContents.send("wallet-loaded")
 
-  setInterval(async ()=>{
-    await Wallet.refresh()
-  }, 30000)
+    setInterval(async ()=>{
+      await Wallet.refresh()
+    }, 30000)
+
+  } catch (e) {
+    throw new Error("Unable to load wallet: " + e)
+  }
+
 
 })
 

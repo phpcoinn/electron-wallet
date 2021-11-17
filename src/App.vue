@@ -1,7 +1,7 @@
 <template>
     <div class="window">
 
-        <div class="sidebar">
+        <div class="sidebar d-flex flex-column">
             <div class="logo">
                 <img :src="require('./assets/img/logo.png')"/>
             </div>
@@ -26,6 +26,9 @@
                     <span v-html="Icons.iconSettings"></span>
                     <div class="title">SETTINGS</div>
                 </router-link>
+            </div>
+            <div class="app-ver text-white-50 text-center mt-auto" v-if="$store && $store.state && $store.state.appState && $store.state.appState.info">
+                {{$store.state.appState.info.version}}
             </div>
         </div>
 
@@ -115,7 +118,7 @@
 
         data() {
             return {
-                password: null
+                password: null,
             }
         },
 

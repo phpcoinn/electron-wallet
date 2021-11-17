@@ -243,11 +243,23 @@ async function loop() {
             if (response) {
                 if (response.status === 'ok') {
                     minerData.miningStat.accepted++
+                    minerData.logs.unshift({
+                        type: 'success',
+                        time: Date.now(),
+                        title: 'Hash accepted',
+                        message: response.data
+                    })
                     await Wallet.refresh()
                 } else {
-                    console.log(JSON.stringify(response))
+                    // console.log(JSON.stringify(response))
                     minerData.miningStat.rejected++
                     minerData.miningStat.rejectedReason = response.data
+                    minerData.logs.unshift({
+                        type: 'danger',
+                        time: Date.now(),
+                        title: 'Hash rejected',
+                        message: response.data
+                    })
                 }
             } else {
                 minerData.miningStat.rejected++
@@ -258,6 +270,13 @@ async function loop() {
             updateUi()
             await new Promise(resolve => setTimeout(resolve, 2000));
         } catch (e) {
+            minerData.logs.unshift({
+                type: 'warning',
+                time: Date.now(),
+                title: 'Error in miner',
+                message: 'Error: ' + e
+            })
+            updateUi()
             console.error(e)
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
@@ -291,7 +310,13 @@ function updateUi() {
     App.updateState()
 }
 
+function clearLog() {
+    minerData.logs = []
+    updateUi()
+}
+
 export {
     start,
-    stop
+    stop,
+    clearLog
 }

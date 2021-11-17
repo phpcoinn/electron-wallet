@@ -382,12 +382,16 @@ async function decryptWallet() {
 }
 
 async function refresh() {
-    await checkAddress()
-    await setWalletBalance()
-    await setMempoolBalance()
-    await getTransactions()
-    await getPeerInfo()
-    App.updateState()
+    try {
+        await checkAddress()
+        await setWalletBalance()
+        await setMempoolBalance()
+        await getTransactions()
+        await getPeerInfo()
+        App.updateState()
+    } catch (e) {
+        console.error("Error in wallet refresh " + e)
+    }
 }
 
 async function getPeers() {
