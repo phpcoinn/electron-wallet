@@ -270,12 +270,12 @@ async function loop() {
             updateUi()
             await new Promise(resolve => setTimeout(resolve, 2000));
         } catch (e) {
-            minerData.logs.unshift({
-                type: 'warning',
-                time: Date.now(),
-                title: 'Error in miner',
-                message: 'Error: ' + e
-            })
+            // minerData.logs.unshift({
+            //     type: 'warning',
+            //     time: Date.now(),
+            //     title: 'Error in miner',
+            //     message: 'Error: ' + e
+            // })
             updateUi()
             console.error(e)
             await new Promise(resolve => setTimeout(resolve, 2000));
