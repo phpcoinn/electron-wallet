@@ -17,7 +17,8 @@ protocol.registerSchemesAsPrivileged([
 ])
 
 process.on('uncaughtException', function (error) {
-  dialog.showErrorBox('Uncaught exception', error.stack)
+  console.log(error)
+  //dialog.showErrorBox('Uncaught exception', error.stack)
 })
 
 process.on('unhandledRejection', function(err) {

@@ -3,6 +3,7 @@ import * as Wallet from "@/Wallet";
 import * as argon2 from "argon2"
 import crypto from "crypto";
 import * as Axios from "./utils/Axios";
+//import {dialog} from "electron";
 
 
 let minerData = App.state.minerData
@@ -20,7 +21,16 @@ function start() {
 
     startTime = Date.now()
 
+
     new Promise(async (resolve, reject) => {
+
+        //TODO: miner-ip-check
+        // let res = await checkMineAddress()
+        // if(!res) {
+        //     dialog.showErrorBox('Error', 'Not allowed mining to this address from this ip')
+        //     reject()
+        //     return
+        // }
 
         console.log("starting miner")
         minerData.status = "Starting miner"
@@ -226,10 +236,7 @@ async function loop() {
                 date: new_block_date,
                 data: JSON.stringify(data),
                 elapsed,
-                minerInfo: {
-                    miner: 'electron-wallet',
-                    version: App.state.info.version
-                }
+                minerInfo: 'electron-wallet ' + App.state.info.version
             }
 
 
@@ -297,6 +304,24 @@ async function getMineInfo() {
         console.error(e)
     }
     return info
+}
+
+async function checkMineAddress() {
+    let address = App.state.walletData.address
+    let postData = {
+        address
+    }
+    try {
+        let response = await Axios.post(App.state.settings.miningNode + '/mine.php?q=checkAddress', postData)
+        if (response.status === 'ok') {
+            if(response.data === address) {
+                return true
+            }
+        }
+    } catch (e) {
+        console.log(e)
+        return false
+    }
 }
 
 function stop() {
