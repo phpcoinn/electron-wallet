@@ -1,6 +1,6 @@
 {
     "network": "mainnet",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "testnet": {
         "miningNode": "https://miner1.testnet.phpcoin.net",
         "faucetLink": "https://node1.testnet.phpcoin.net/apps/faucet",
