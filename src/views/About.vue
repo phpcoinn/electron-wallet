@@ -11,7 +11,13 @@
         <div class="row flex-grow-1 d-flex align-content-start p-3 fs-5">
             <dl>
                <dd>Version</dd>
-               <dt>{{info.version}}</dt>
+               <dt>
+                   {{info.version}}
+                   <span class="badge bg-success" style="cursor: pointer" @click="$parent.openUpdateUrl()"
+                         v-if="$parent.hasUpdate()">
+                       Update available
+                   </span>
+               </dt>
             </dl>
             <dl>
                <dd>Github version</dd>
@@ -40,7 +46,7 @@ export default {
         info() {
             return this.$store.state.appState.info
         }
-    }
+    },
 }
 </script>
 

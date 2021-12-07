@@ -17,6 +17,10 @@
         "aboutUrl": "https://phpcoin.net",
         "walletUrl": "https://wallet.phpcoin.net",
         "block_time": 60,
-        "network_prefix": "38"
+        "network_prefix": "38",
+        "updateLink": {
+            "linux": "https://phpcoin.net/download/phpcoin-wallet-linux",
+            "win32": "https://phpcoin.net/download/phpcoin-wallet-win.exe"
+        }
     }
 }

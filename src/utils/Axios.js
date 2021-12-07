@@ -4,7 +4,7 @@ function getResponse(response, data) {
     let r = data.toString('utf-8')
     let contentType = response.headers['content-type']
     // console.log("contentType", contentType, response)
-    if(contentType.startsWith('application/json')) {
+    if(contentType && contentType.startsWith('application/json')) {
         try {
             r = JSON.parse(r)
         } catch (e) {

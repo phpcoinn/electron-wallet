@@ -87,6 +87,11 @@ app.on('ready', async () => {
 
   App.loadSettings()
 
+  App.getLatestVersion().then(version => {
+    App.state.info.latestVersion = version
+    App.updateState()
+  })
+
   try {
     App.updateStatus('Loading wallet...')
     await Wallet.setWalletPeer()
@@ -189,4 +194,14 @@ ipcMain.on("get-peers", async (event, data)=>{
 
 ipcMain.on("open-url", (event, url) => {
   shell.openExternal(url)
+})
+
+ipcMain.on("open-update-link", (event, data) => {
+  let platform = process.platform
+  let url= App.config.updateLink[platform]
+  if(!url) {
+    dialog.showErrorBox(  'Error',`No update link for platform ${platform}`)
+  } else {
+    shell.openExternal(url)
+  }
 })

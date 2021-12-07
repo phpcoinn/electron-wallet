@@ -3,7 +3,7 @@ import * as Wallet from "@/Wallet";
 import * as argon2 from "argon2"
 import crypto from "crypto";
 import * as Axios from "./utils/Axios";
-//import {dialog} from "electron";
+import {dialog} from "electron";
 
 
 let minerData = App.state.minerData
@@ -24,13 +24,12 @@ function start() {
 
     new Promise(async (resolve, reject) => {
 
-        //TODO: miner-ip-check
-        // let res = await checkMineAddress()
-        // if(!res) {
-        //     dialog.showErrorBox('Error', 'Not allowed mining to this address from this ip')
-        //     reject()
-        //     return
-        // }
+        let res = await checkMineAddress()
+        if(!res) {
+            dialog.showErrorBox('Error', 'Not allowed mining to this address from this ip')
+            reject()
+            return
+        }
 
         console.log("starting miner")
         minerData.status = "Starting miner"
@@ -158,7 +157,6 @@ async function loop() {
                 }
 
                 attempt++
-                console.log("calculating hash, attempt", attempt)
                 minerData.miningStat.hashes++
 
                 if (attempt % 10 === 0) {
@@ -172,7 +170,6 @@ async function loop() {
                 }
 
                 await new Promise(resolve => setTimeout(resolve, 500));
-
                 now = Math.round(Date.now() / 1000)
                 elapsed = now + offset - block_date
                 console.log(`now=${now} offset=${offset} block_date=${block_date} elapsed=${elapsed}`)
@@ -191,7 +188,7 @@ async function loop() {
                     type: argon2.argon2i,
                     hashLength: 32
                 })
-                console.log("argon2 hash", argon)
+                //console.log("argon2 hash", argon)
 
                 nonceBase = `${address}-${block_date}-${elapsed}-${argon}`
 
@@ -207,12 +204,15 @@ async function loop() {
                 if (hit > maxHit) {
                     maxHit = hit
                 }
+                if(elapsed <= 0) {
+                    break
+                }
                 target = Math.round(difficulty * block_time / elapsed)
                 if (target > maxTarget) {
                     maxTarget = target
                 }
-                blockFound = (hit > 0 && target >= 0 && hit > target)
-                console.log(`block_time=${block_time} elapsed=${elapsed} difficulty=${difficulty} hit=${hit} target=${target} blockFound=${blockFound}`)
+                blockFound = (hit > 0 && target > 0 && hit > target)
+                console.log(`attempt=${attempt} block_time=${block_time} elapsed=${elapsed} difficulty=${difficulty} hit=${hit} target=${target} blockFound=${blockFound}`)
 
                 minerData.miner.hit = hit
                 minerData.miner.maxHit = maxHit

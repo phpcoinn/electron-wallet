@@ -29,6 +29,9 @@
             </div>
             <div class="app-ver text-white-50 text-center mt-auto" v-if="$store && $store.state && $store.state.appState && $store.state.appState.info">
                 {{$store.state.appState.info.version}}
+                <span class="badge bg-success" style="cursor: pointer" @click="openUpdateUrl()" v-if="hasUpdate()">
+                   Update available
+               </span>
             </div>
         </div>
 
@@ -113,6 +116,7 @@
 <script>
     import {ipcRenderer} from "electron";
     import * as Icons from "./utils/Icons"
+    import compareVersions from "compare-versions";
 
     export default {
 
@@ -131,6 +135,9 @@
             },
             walletData() {
                 return this.$store.state.appState.walletData
+            },
+            info() {
+                return this.$store.state.appState.info
             }
         },
 
@@ -164,6 +171,15 @@
              },
              exitWallet() {
                  ipcRenderer.send('exit-wallet')
+             },
+             hasUpdate() {
+                 if(this.info.latestVersion) {
+                     return (compareVersions(this.info.latestVersion, this.info.version) > 0)
+                 }
+                 return false
+             },
+             openUpdateUrl() {
+                 ipcRenderer.send('open-update-link')
              }
          }
 

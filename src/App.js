@@ -1,5 +1,6 @@
 import {dialog} from "electron";
 import { exec } from "child_process";
+import * as Axios from "@/utils/Axios";
 
 const fs = require("fs")
 const path = require("path")
@@ -55,7 +56,8 @@ let state = {
     },
     info: {
         version: version,
-        network: network
+        network: network,
+        latestVersion: null
     },
     config
 }
@@ -85,6 +87,17 @@ function loadSettings() {
     }
 }
 
+async function getLatestVersion() {
+    try {
+        let response = await Axios.get('https://raw.githubusercontent.com/phpcoinn/electron-wallet/master/package.json')
+        let data = JSON.parse(response)
+        return data.version
+    } catch (e) {
+        console.log(e)
+        return false
+    }
+}
+
 function storeSettings(data) {
     let settingsFile = path.join(process.cwd(), 'settings.json')
     fs.writeFileSync(settingsFile, JSON.stringify(data, null, 4))
@@ -97,7 +110,9 @@ function showError(message) {
 
 function updateState() {
     // console.log("SEND STATE UPDATE", state.minerData)
-    win.webContents.send("state-update", state)
+    if(win &&  win.webContents) {
+        win.webContents.send("state-update", state)
+    }
 }
 
 export {
@@ -110,5 +125,6 @@ export {
     showError,
     state,
     updateState,
-    config
+    config,
+    getLatestVersion
 }
