@@ -180,8 +180,17 @@ async function loop() {
                 minerData.miner.attempt = attempt
                 minerData.miner.new_block_date = new_block_date
 
+                let salt = Buffer.from(address.substr(0, 16))
+                if(info.hashingOptions) {
+                    hashingConfig.mem = info.hashingOptions.memory_cost
+                    hashingConfig.parallelism = info.hashingOptions.threads
+                    hashingConfig.time = info.hashingOptions.time_cost
+                    salt = crypto.randomBytes(16).toString('hex')
+                    salt = Buffer.from(address.substr(0, 16))
+                }
+
                 argon = await argon2.hash(argonBase, {
-                    salt: Buffer.from(address.substr(0, 16)),
+                    salt,
                     memoryCost: hashingConfig.mem,
                     timeCost: hashingConfig.time,
                     parallelism: hashingConfig.parallelism,
