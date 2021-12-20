@@ -185,8 +185,8 @@ async function loop() {
                     hashingConfig.mem = info.hashingOptions.memory_cost
                     hashingConfig.parallelism = info.hashingOptions.threads
                     hashingConfig.time = info.hashingOptions.time_cost
-                    salt = crypto.randomBytes(16).toString('hex')
-                    salt = Buffer.from(address.substr(0, 16))
+                    salt = crypto.randomBytes(8).toString('hex')
+                    salt = Buffer.from(salt)
                 }
 
                 argon = await argon2.hash(argonBase, {
