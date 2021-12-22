@@ -37,6 +37,7 @@ let state = {
         status: null,
         running: false,
         blockFound: false,
+        break: false,
         miner: {
             attempt: 0,
             block: null,
@@ -50,7 +51,8 @@ let state = {
             rejected: 0,
             rejectedReason: null,
             dropped: 0,
-            nodeStatus: null
+            nodeStatus: null,
+            speed: 0,
         },
         logs: []
     },

@@ -49,7 +49,16 @@
 
                         <template v-if="minerData">
 
-                            <div class="d-flex justify-content-between">
+                            <div class="row mb-2 fs-5">
+                                <div class="col">
+                                    Speed: {{minerData.miningStat.speed}} H/s
+                                </div>
+                                <div class="col">
+                                    <input type="range" class="form-range" v-model="cpu" @change="updateMinerCpu" min="0" max="100">
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between fs-5">
                                 <div>
                                     Mining block: <span class="badge bg-info">{{minerData.miner.height}}</span><br/>
                                 </div>
@@ -223,6 +232,7 @@ export default {
     name: "Miner",
     data() {
       return {
+          cpu: 0
       }
     },
     mounted() {
@@ -252,6 +262,9 @@ export default {
                 return
             }
             ipcRenderer.send('miner-cmd', 'clearLog')
+        },
+        updateMinerCpu() {
+            ipcRenderer.send('miner-cmd', 'updateMinerCpu', this.cpu)
         }
     },
     computed: {

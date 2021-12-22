@@ -17,6 +17,11 @@ let block_time = App.config.block_time
 
 let startTime
 
+let cpu = 0
+
+let updateUiTimer
+let mineInfoTimer
+
 function start() {
 
     startTime = Date.now()
@@ -45,6 +50,22 @@ function start() {
     }).catch(err=>{
         console.log("Error running miner")
     })
+
+    updateUiTimer = setInterval(()=>{
+        updateUi()
+    }, 1000)
+
+    mineInfoTimer = setInterval(()=>{
+        getMineInfo().then(info=>{
+            console.log(`Node height ${info.height} we mine ${minerData.miner.height}`)
+            if (info.block !== minerData.miner.block) {
+                console.log(`New block detected - starting over`)
+                minerData.miningStat.dropped++
+                minerData.break = true
+            }
+        })
+
+    }, 10000)
 
 }
 
@@ -142,13 +163,15 @@ async function loop() {
                 submitResponse,
                 times,
                 attempt,
-                runningTime
+                runningTime,
+                block
             }
 
             if (Array.isArray(data) && data.length === 0) {
                 data = {}
             }
 
+            let t1 = Date.now()
             while (!blockFound) {
 
                 if (!minerData.running) {
@@ -156,23 +179,24 @@ async function loop() {
                     break
                 }
 
+                if (minerData.break) {
+                    minerData.break = false
+                    break
+                }
+
                 attempt++
                 minerData.miningStat.hashes++
 
-                if (attempt % 10 === 0) {
-                    let info = await getMineInfo()
-                    console.log(`Node height ${info.height} we mine ${minerData.miner.height}`)
-                    if (info.block !== block) {
-                        console.log(`New block detected - starting over`)
-                        minerData.miningStat.dropped++
-                        break
-                    }
-                }
+                let t2 = Date.now()
+                let diff = t2 - t1
+                minerData.miningStat.speed = ( attempt / (diff / 1000)).toFixed(2)
 
-                await new Promise(resolve => setTimeout(resolve, 500));
+                let ms = (100 - cpu) * 5
+                await new Promise(resolve => setTimeout(resolve, ms));
                 now = Math.round(Date.now() / 1000)
                 elapsed = now + offset - block_date
-                console.log(`now=${now} offset=${offset} block_date=${block_date} elapsed=${elapsed}`)
+
+                // console.log(`now=${now} offset=${offset} block_date=${block_date} elapsed=${elapsed}`)
                 argonBase = `${block_date}-${elapsed}`
                 new_block_date = block_date + elapsed
 
@@ -221,14 +245,13 @@ async function loop() {
                     maxTarget = target
                 }
                 blockFound = (hit > 0 && target > 0 && hit > target)
-                console.log(`attempt=${attempt} block_time=${block_time} elapsed=${elapsed} difficulty=${difficulty} hit=${hit} target=${target} blockFound=${blockFound}`)
+                // console.log(`attempt=${attempt} block_time=${block_time} elapsed=${elapsed} difficulty=${difficulty} hit=${hit} target=${target} blockFound=${blockFound}`)
 
                 minerData.miner.hit = hit
                 minerData.miner.maxHit = maxHit
                 minerData.miner.target = target
                 minerData.miner.maxTarget = maxTarget
                 minerData.miner.runningTime = Date.now() - startTime
-                updateUi()
             }
 
             if (!blockFound || elapsed<=0) {
@@ -336,8 +359,10 @@ async function checkMineAddress() {
 function stop() {
     console.log("stopping miner")
     minerData.status = "Stoping miner"
-    updateUi()
+    clearInterval(updateUiTimer)
+    clearInterval(mineInfoTimer)
     minerData.running = false
+    updateUi()
 }
 
 function updateUi() {
@@ -349,8 +374,13 @@ function clearLog() {
     updateUi()
 }
 
+function updateMinerCpu(c) {
+    cpu = c
+}
+
 export {
     start,
     stop,
-    clearLog
+    clearLog,
+    updateMinerCpu
 }
