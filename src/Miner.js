@@ -29,13 +29,6 @@ function start() {
 
     new Promise(async (resolve, reject) => {
 
-        let res = await checkMineAddress()
-        if(!res) {
-            dialog.showErrorBox('Error', 'Not allowed mining to this address from this ip')
-            reject()
-            return
-        }
-
         console.log("starting miner")
         minerData.status = "Starting miner"
         minerData.running = true
@@ -57,8 +50,8 @@ function start() {
 
     mineInfoTimer = setInterval(()=>{
         getMineInfo().then(info=>{
-            console.log(`Node height ${info.height} we mine ${minerData.miner.height}`)
-            if (info.block !== minerData.miner.block) {
+            // console.log(`Node height ${info.height} we mine ${minerData.miner.height}`)
+            if (info && minerData && minerData.miner && info.block !== minerData.miner.block) {
                 console.log(`New block detected - starting over`)
                 minerData.miningStat.dropped++
                 minerData.break = true
