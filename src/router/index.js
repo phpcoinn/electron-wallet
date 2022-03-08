@@ -9,6 +9,8 @@ import Settings from '../views/Settings.vue'
 import Info from '../views/Info.vue'
 import About from '../views/About.vue'
 import Peers from '../views/Peers.vue'
+import Masternodes from '../views/Masternodes.vue'
+import Sign from '../views/Sign.vue'
 
 Vue.use(VueRouter)
 
@@ -52,6 +54,16 @@ const routes = [
     path: '/peers',
     name: 'Peers',
     component: Peers
+  },
+  {
+    path: '/masternodes',
+    name: 'Masternodes',
+    component: Masternodes
+  },
+  {
+    path: '/sign',
+    name: 'Sign',
+    component: Sign
   },
   {
     path: '/about',

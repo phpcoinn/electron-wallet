@@ -1,23 +1,27 @@
 {
     "network": "mainnet",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "testnet": {
-        "miningNode": "https://miner1.testnet.phpcoin.net",
-        "faucetLink": "https://node1.testnet.phpcoin.net/apps/faucet",
-        "peersUrl": "https://node1.testnet.phpcoin.net/peers.php",
+        "miningNode": "https://miner1.testnet.phpcoin.net:8001",
+        "walletNode": "https://wallet.testnet.phpcoin.net:8001",
+        "faucetLink": "https://node1.testnet.phpcoin.net:8001/apps/faucet",
+        "peersUrl": "https://node1.testnet.phpcoin.net:8001/peers.php",
         "aboutUrl": "https://phpcoin.net",
-        "walletUrl": "https://wallet.testnet.phpcoin.net",
+        "walletUrl": "https://wallet.testnet.phpcoin.net:8001",
         "block_time": 30,
-        "network_prefix": "30"
+        "network_prefix": "30",
+        "masternode_collateral": 1000
     },
     "mainnet": {
         "miningNode": "https://miner1.phpcoin.net",
+        "walletNode": "https://wallet.phpcoin.net",
         "faucetLink": "https://faucet.phpcoin.net/apps/faucet",
         "peersUrl": "https://node1.phpcoin.net/peers.php",
         "aboutUrl": "https://phpcoin.net",
         "walletUrl": "https://wallet.phpcoin.net",
         "block_time": 60,
         "network_prefix": "38",
+        "masternode_collateral": 10000,
         "updateLink": {
             "linux": "https://phpcoin.net/download/phpcoin-wallet-linux",
             "win32": "https://phpcoin.net/download/phpcoin-wallet-win.exe"

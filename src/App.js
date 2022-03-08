@@ -30,7 +30,9 @@ let state = {
         mempoolBalance: null
     },
     settings:{
-        miningNode: config.miningNode
+        miningNode: config.miningNode,
+        autoWalletNode: true,
+        walletNode: config.walletNode
     },
     transactions: [],
     minerData: {
@@ -85,7 +87,9 @@ function loadSettings() {
     if(fs.existsSync(settingsFile)) {
         let data = fs.readFileSync(settingsFile, 'utf8')
         data = JSON.parse(data)
-        state.settings = data
+        for(let i in data) {
+            state.settings[i] = data[i]
+        }
     }
 }
 

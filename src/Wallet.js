@@ -1,6 +1,7 @@
 import {win} from "@/App";
 import {shell} from "electron";
 import config from "../config.json";
+import path from "path";
 
 const fs = require("fs");
 const cryptoUtil = require("./utils/cryptoUtil");
@@ -22,9 +23,18 @@ function enableMenuItem(id, enabled) {
     }
 }
 
-async function loadWallet() {
-    let walletDir = app.getPath('home');
-    walletData.file = walletDir + "/phpcoin.dat"
+async function loadWallet(file = null) {
+    if(!file) {
+        let lastWalletFile = App.state.settings.lastWalletFile
+        if(lastWalletFile) {
+            walletData.file = lastWalletFile
+        } else {
+            let walletDir = app.getPath('home')
+            walletData.file = walletDir + "/phpcoin.dat"
+        }
+    } else {
+        walletData.file = file
+    }
     console.log("call load-wallet file="+walletData.file)
     let walletFile = walletData.file
     if(fs.existsSync(walletFile)) {
@@ -78,6 +88,13 @@ async function loadWallet() {
     await getPeerInfo()
     App.updateStatus('Wallet loaded')
     AppMenu.loadMenu()
+    let settingsFile = path.join(process.cwd(), 'settings.json')
+    if(fs.existsSync(settingsFile)) {
+        let data = fs.readFileSync(settingsFile, 'utf8')
+        data = JSON.parse(data)
+        data.lastWalletFile = walletFile
+        fs.writeFileSync(settingsFile, JSON.stringify(data,null, 4))
+    }
 }
 
 async function getQrCode() {
@@ -91,28 +108,35 @@ async function getQrCode() {
 async function checkAddress() {
     let url = `${walletData.walletPeer}/api.php?q=getPublicKey&address=${walletData.address}`
     try {
+        walletData.verifiedAddress = false
         let publicKey = await peerGet(url)
         console.log('checkAddress', url, publicKey, walletData.publicKey)
         if(publicKey === walletData.publicKey) {
             walletData.verifiedAddress = true
         }
     } catch (e) {
-        console.log(e)
+        walletData.verifiedAddress = false
     }
     enableMenuItem('verify_address', !walletData.verifiedAddress)
     AppMenu.loadMenu()
 }
 
 async function setWalletPeer() {
-    let peersUrl = App.config.peersUrl
-    console.log("call setWalletPeer", peersUrl, App.config)
-    let peerList = await Axios.get(peersUrl)
-    console.log("peerList", peerList)
-    let arr = peerList.split('\n')
-    arr = arr.filter(i => {return i.length > 0})
-    let len = arr.length
-    let num = Math.floor(Math.random()*len)
-    walletData.walletPeer = arr[num]
+
+    let autoWalletNode = App.state.settings.autoWalletNode
+    let walletPeer
+    if(autoWalletNode) {
+        let peersUrl = App.config.peersUrl
+        let peerList = await Axios.get(peersUrl)
+        let arr = peerList.split('\n')
+        arr = arr.filter(i => {return i.length > 0})
+        let len = arr.length
+        let num = Math.floor(Math.random()*len)
+        walletPeer = arr[num]
+    } else {
+        walletPeer = App.state.settings.walletNode
+    }
+    walletData.walletPeer = walletPeer
     console.log(`set wallet peer: `,walletData.walletPeer)
     await getPeerInfo()
     App.updateState()
@@ -250,27 +274,8 @@ async function send(arg) {
         fee = Number(fee).toFixed(8)
         let dst = arg.address.trim()
         let type = 1
-        let publicKey = walletData.publicKey
-        let date = Math.round(new Date().getTime()/1000)
-        let txData = `${amount}-${fee}-${dst}-${msg}-${type}-${publicKey}-${date}`
-        console.log('Created txData', txData)
 
-        let signature = cryptoUtil.sign(txData, cryptoUtil.privateKeyToPem(walletData.privateKey))
-        console.log('signature', signature)
-
-        url = `${walletData.walletPeer}/api.php?q=send`
-        let data = {
-            dst,
-            val: amount,
-            signature,
-            public_key: publicKey,
-            type,
-            message: msg,
-            date
-        }
-        console.log(`Sending transaction to peer`, data)
-
-        let tx = await peerPost(url, {data: JSON.stringify(data)})
+        let tx = await sendTx(amount, fee, dst, msg, type)
 
         await refresh()
 
@@ -401,6 +406,147 @@ async function getPeers() {
     return res.data
 }
 
+async function getMasternodes() {
+    let url = `${walletData.walletPeer}/api.php?q=getMasternodes`
+    let res = await Axios.get(url)
+    let list = res.data
+    let isWalletMn = list.filter(mn => mn.id === walletData.address).length > 0
+    url = `${walletData.walletPeer}/api.php?q=getMasternodesForAddress&address=${walletData.address}`
+    res = await Axios.get(url)
+    let walletMasternodes = []
+    if(res.status === 'ok' && res.data) {
+        walletMasternodes = res.data
+    }
+    return {list, isWalletMn, walletMasternodes}
+}
+
+async function exportWallet() {
+    let options = {
+        title: "Export PHP Coin wallet to file",
+        defaultPath: 'phpcoin.dat',
+        filters :[
+            {name: 'Wallet Files', extensions: ['dat']}
+        ]
+    }
+    let filename = dialog.showSaveDialogSync(App.win, options)
+    if(filename) {
+        let content = 'phpcoin' + '\n'
+        content += walletData.privateKey + '\n'
+        content += walletData.publicKey + '\n'
+        fs.writeFileSync(filename, content)
+    }
+}
+
+async function openWalletFromFile() {
+    let filename = dialog.showOpenDialogSync(App.win, {
+        filters: [{name: 'Wallet Files', extensions: ['dat']}]
+    })
+    if(filename) {
+        filename = filename [0]
+        await loadWallet(filename)
+        await getTransactions()
+        App.updateState()
+        App.goto('/')
+    }
+}
+
+async function newWallet() {
+    let options = {
+        title: "Create new PHP Coin Wallet file",
+        defaultPath: 'phpcoin.dat',
+        filters :[
+            {name: 'Wallet Files', extensions: ['dat']}
+        ]
+    }
+    let filename = dialog.showSaveDialogSync(App.win, options)
+    if(filename) {
+        App.updateStatus('Creating wallet')
+        let keys = cryptoUtil.generateKeys()
+        let str = `phpcoin\n${keys.privateKey}\n${keys.publicKey}`
+        fs.writeFileSync(filename, str)
+        await loadWallet(filename)
+        await getTransactions()
+        App.updateState()
+        App.goto('/')
+    }
+}
+
+function sign(message) {
+    let signature = cryptoUtil.sign(message, cryptoUtil.privateKeyToPem(walletData.privateKey))
+    return signature
+}
+
+async function sendTx(amount, fee, dst, msg, type) {
+    let publicKey = walletData.publicKey
+    let date = Math.round(new Date().getTime()/1000)
+    let txData = `${amount}-${fee}-${dst}-${msg}-${type}-${publicKey}-${date}`
+
+    let signature = cryptoUtil.sign(txData, cryptoUtil.privateKeyToPem(walletData.privateKey))
+
+    let url = `${walletData.walletPeer}/api.php?q=send`
+    let data = {
+        dst,
+        val: amount,
+        signature,
+        public_key: publicKey,
+        type,
+        message: msg,
+        date
+    }
+    let tx = await peerPost(url, {data: JSON.stringify(data)})
+    return tx
+}
+
+async function createMasternode(address) {
+
+    let fee = 0
+
+    try {
+        let amount = App.config.masternode_collateral
+        let msg ='mncreate'
+        amount = Number(amount).toFixed(8)
+        fee = Number(fee).toFixed(8)
+        let dst = address.trim()
+        let type = 2
+
+        let tx = await sendTx(amount, fee, dst, msg, type)
+        await refresh()
+        dialog.showMessageBoxSync(win, {type:'info', title:'Success', message:'Your transaction is created'})
+        return tx
+
+    } catch (e) {
+        console.error("error in wallet-send", e)
+        App.showError(e.message)
+        return false
+    }
+}
+
+async function removeMasternode(address) {
+    console.log("call wallet-remove-masternode")
+    let amount = App.config.masternode_collateral
+    let fee = 0
+    try {
+
+        let msg ='mnremove'
+        amount = Number(amount).toFixed(8)
+        fee = Number(fee).toFixed(8)
+        let dst = address.trim()
+        let type = 3
+
+        let tx = await sendTx(amount, fee, dst, msg, type)
+
+        await refresh()
+
+        dialog.showMessageBoxSync(win, {type:'info', title:'Success', message:'Your transaction is created'})
+        return tx
+
+    } catch (e) {
+        console.error("error in wallet-remove-masternode", e, e.stack)
+        App.showError(e.message)
+        return false
+    }
+}
+
 export {
     loadWallet,
     deleteWallet,
@@ -419,5 +565,12 @@ export {
     setWalletBalance,
     getPeerInfo,
     getPeers,
-    setMempoolBalance
+    getMasternodes,
+    setMempoolBalance,
+    exportWallet,
+    openWalletFromFile,
+    newWallet,
+    sign,
+    removeMasternode,
+    createMasternode,
 }

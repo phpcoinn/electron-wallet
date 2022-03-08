@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex flex-column flex-fill">
+    <div class="d-flex flex-column flex-fill overflow-auto">
 
         <div class="flex-grow-0 p-3">
             <div class="fs-5">Peers</div>
@@ -7,10 +7,7 @@
         </div>
 
         <hr class="mx-3 my-0"/>
-
-        <div class="row flex-grow-1 d-flex align-content-start p-3 mw-0">
-
-            <div class="table-responsive">
+            <div class="p-3">
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -54,8 +51,6 @@
                     </tbody>
                 </table>
             </div>
-
-        </div>
     </div>
 </template>
 

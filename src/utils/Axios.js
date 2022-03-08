@@ -44,20 +44,20 @@ function post(url, postData) {
             method: 'POST',
             url
         })
-        request.setHeader('Content-Type','application/x-www-form-urlencoded')
-        request.on('response', (response) => {
-            response.on('data', (data) => {
+            request.setHeader('Content-Type','application/x-www-form-urlencoded')
+            request.on('response', (response) => {
+                response.on('data', (data) => {
                 resolve(getResponse(response, data))
-            })
-            response.on('end', () => {
+                })
+                response.on('end', () => {
 
+                })
             })
-        })
-        request.on('error', err => {
-            reject(err)
-        })
-        request.write(postData)
-        request.end()
+            request.on('error', err => {
+                reject(err)
+            })
+            request.write(postData)
+            request.end()
     })
 }
 

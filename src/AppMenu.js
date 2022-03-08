@@ -1,4 +1,4 @@
-import {app, shell} from "electron";
+import {shell} from "electron";
 
 const {Menu, dialog} = require("electron");
 const App = require("./App");
@@ -30,19 +30,30 @@ const template = [
     {
         label: 'File',
         submenu: [
-            // {
-            //     id:"delete",
-            //     label: "Delete",
-            //     click() {
-            //         let response = dialog.showMessageBoxSync({
-            //             buttons: ["Yes","No"],
-            //             message: "Do you really want to delete wallet?"
-            //         })
-            //         if(response === 0) {
-            //             Wallet.deleteWallet()
-            //         }
-            //     }
-            // },
+            {
+                id: "new",
+                label: "New...",
+                async click() {
+                    await Wallet.newWallet()
+                }
+            },
+            {
+                id: "open",
+                label: "Open...",
+                async click() {
+                    await Wallet.openWalletFromFile()
+                }
+            },
+            {
+                id: "save",
+                label: "Save as...",
+                async click() {
+                    await Wallet.exportWallet()
+                }
+            },
+            {
+                type: 'separator'
+            },
             {
                 id: "encrypt",
                 label: "Encrypt",
@@ -151,6 +162,13 @@ const template = [
                 enabled: false
             },
             {
+                id:'sign',
+                label: 'Sign message...',
+                click() {
+                    App.goto('/sign')
+                }
+            },
+            {
                 label: "Info",
                 click() {
                     App.goto('/info')
@@ -160,6 +178,12 @@ const template = [
                 label: "Peers",
                 click() {
                     App.goto('/peers')
+                }
+            },
+            {
+                label: "Masternodes",
+                click() {
+                    App.goto('/masternodes')
                 }
             },
             {

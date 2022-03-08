@@ -10,6 +10,19 @@
 
         <form class="row flex-grow-1 d-flex align-content-start p-3">
             <div class="row mb-3">
+                <label for="miningNode" class="col-sm-2 col-form-label">Wallet node:</label>
+                <div class="col-sm-6">
+                    <input type="checkbox" v-model="settings.autoWalletNode"> Automatic
+                    <input type="text" v-model="settings.walletNode" class="form-control" id="walletNode"
+                        :disabled="settings.autoWalletNode">
+                </div>
+                <div class="col-sm-4">
+                    <span class="col-form-label text-muted">
+                        Address of node to which wallet is connected<br/>
+                    </span>
+                </div>
+            </div>
+            <div class="row mb-3">
                 <label for="miningNode" class="col-sm-2 col-form-label">Mining node:</label>
                 <div class="col-sm-6">
                     <input type="text" v-model="settings.miningNode" class="form-control" id="miningNode">

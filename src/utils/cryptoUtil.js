@@ -80,7 +80,7 @@ module.exports = {
     },
     getAddress,
     sign(data, privateKey) {
-        console.log(`Sign ${data} with ${privateKey}`)
+        // console.log(`Sign ${data} with ${privateKey}`)
         let signature = Ecdsa.sign(data, privateKey);
         // console.log('signature',signature)
         let signature_b64 = signature.toBase64()
@@ -93,16 +93,16 @@ module.exports = {
     },
     privateKeyToPem(privateKeyBase58) {
         let private_key_bin = Base58.decode(privateKeyBase58)
-        console.log('private_key_bin',private_key_bin)
+        // console.log('private_key_bin',private_key_bin)
         let private_key_base64 = Buffer.from(private_key_bin).toString('base64');
-        console.log('private_key_base64', private_key_base64)
+        // console.log('private_key_base64', private_key_base64)
         let private_key_pem = '-----BEGIN EC PRIVATE KEY-----\n'
             + str_split(private_key_base64, 64)
                 .join('\n')
             + '\n-----END EC PRIVATE KEY-----\n'
-        console.log('private_key_pem',private_key_pem)
+        // console.log('private_key_pem',private_key_pem)
         let privateKey = PrivateKey.fromPem(private_key_pem)
-        console.log('privateKey',privateKey)
+        // console.log('privateKey',privateKey)
         return privateKey
     },
     encryptWallet(wallet, pass) {

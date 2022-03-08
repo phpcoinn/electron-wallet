@@ -56,11 +56,13 @@
                     <dt class="col-sm-3">Type</dt>
                     <dd class="col-sm-9">{{selTransaction.type_label}}</dd>
                     <dt class="col-sm-3">Source</dt>
-                    <dd class="col-sm-9" style="word-break: break-all">{{selTransaction.public_key}}</dd>
+                    <dd class="col-sm-9" style="word-break: break-all">{{selTransaction.src}}</dd>
                     <dt class="col-sm-3">Destination</dt>
                     <dd class="col-sm-9">{{selTransaction.dst}}</dd>
                     <dt class="col-sm-3">Value</dt>
                     <dd class="col-sm-9">{{selTransaction.val|num}}</dd>
+                    <dt class="col-sm-3">Message</dt>
+                    <dd class="col-sm-9">{{selTransaction.message}}</dd>
                 </dl>
             </div>
 

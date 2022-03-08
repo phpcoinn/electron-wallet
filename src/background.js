@@ -33,8 +33,8 @@ async function createWindow() {
   let win = new BrowserWindow({
     // x:0,
     // y:0,
-    width: 1000,
-    height: 600,
+    width: 1200,
+    height: 650,
     icon,
     webPreferences: {
       
@@ -192,8 +192,33 @@ ipcMain.on("get-peers", async (event, data)=>{
   event.returnValue = await Wallet.getPeers()
 })
 
+
 ipcMain.on("open-url", (event, url) => {
   shell.openExternal(url)
+})
+
+ipcMain.on("get-masternodes", async (event, data)=>{
+  let res = await Wallet.getMasternodes()
+  event.returnValue = res
+})
+
+ipcMain.on('wallet-sign',   (event, arg) => {
+  if(!arg) {
+    dialog.showErrorBox('Error', 'Empty message')
+    event.returnValue = null
+  } else {
+    let res = Wallet.sign(arg)
+    event.returnValue = res
+  }
+})
+
+ipcMain.on('wallet-create-masternode',   async(event, arg) => {
+  let res = await Wallet.createMasternode(arg)
+  event.returnValue = res
+})
+ipcMain.on('wallet-remove-masternode',  async (event, arg) => {
+  let res = await Wallet.removeMasternode(arg)
+  event.returnValue = res
 })
 
 ipcMain.on("open-update-link", (event, data) => {

@@ -26,6 +26,10 @@
                     <span v-html="Icons.iconSettings"></span>
                     <div class="title">SETTINGS</div>
                 </router-link>
+                <router-link to="/masternodes"  :class="`menu-item ${$route.name==='Masternodes' ? 'active' : ''}`">
+                    <span v-html="Icons.iconMasternodes"></span>
+                    <div class="title">MASTERNODES</div>
+                </router-link>
             </div>
             <div class="app-ver text-white-50 text-center mt-auto" v-if="$store && $store.state && $store.state.appState && $store.state.appState.info">
                 {{$store.state.appState.info.version}}
