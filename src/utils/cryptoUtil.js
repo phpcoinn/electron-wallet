@@ -79,6 +79,7 @@ module.exports = {
         }
     },
     getAddress,
+    pem2coin,
     sign(data, privateKey) {
         // console.log(`Sign ${data} with ${privateKey}`)
         let signature = Ecdsa.sign(data, privateKey);

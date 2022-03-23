@@ -84,12 +84,13 @@ function goto(url) {
 
 function loadSettings() {
     let settingsFile = path.join(process.cwd(), 'settings.json')
+    let settings = {}
     if(fs.existsSync(settingsFile)) {
-        let data = fs.readFileSync(settingsFile, 'utf8')
-        data = JSON.parse(data)
-        for(let i in data) {
-            state.settings[i] = data[i]
-        }
+        settings = fs.readFileSync(settingsFile, 'utf8')
+        settings = JSON.parse(settings)
+    }
+    for(let i in settings) {
+        state.settings[i] = settings[i]
     }
 }
 
@@ -104,10 +105,9 @@ async function getLatestVersion() {
     }
 }
 
-function storeSettings(data) {
+function storeSettings() {
     let settingsFile = path.join(process.cwd(), 'settings.json')
-    fs.writeFileSync(settingsFile, JSON.stringify(data, null, 4))
-    state.settings = data
+    fs.writeFileSync(settingsFile, JSON.stringify(state.settings, null, 4))
 }
 
 function showError(message) {
@@ -121,6 +121,12 @@ function updateState() {
     }
 }
 
+function clearRecentFilesList() {
+    let settings = state.settings
+    delete settings.recentWallets
+    storeSettings()
+}
+
 export {
     win,
     setWin,
@@ -132,5 +138,6 @@ export {
     state,
     updateState,
     config,
-    getLatestVersion
+    getLatestVersion,
+    clearRecentFilesList
 }

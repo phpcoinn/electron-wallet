@@ -1,4 +1,3 @@
-import {win} from "@/App";
 import {shell} from "electron";
 import config from "../config.json";
 import path from "path";
@@ -24,6 +23,8 @@ function enableMenuItem(id, enabled) {
 }
 
 async function loadWallet(file = null) {
+    App.state.walletData.loaded = false
+    App.updateStatus(null)
     if(!file) {
         let lastWalletFile = App.state.settings.lastWalletFile
         if(lastWalletFile) {
@@ -87,14 +88,23 @@ async function loadWallet(file = null) {
     }
     await getPeerInfo()
     App.updateStatus('Wallet loaded')
-    AppMenu.loadMenu()
-    let settingsFile = path.join(process.cwd(), 'settings.json')
-    if(fs.existsSync(settingsFile)) {
-        let data = fs.readFileSync(settingsFile, 'utf8')
-        data = JSON.parse(data)
-        data.lastWalletFile = walletFile
-        fs.writeFileSync(settingsFile, JSON.stringify(data,null, 4))
+    let settings = App.state.settings
+    settings.lastWalletFile = walletFile
+    if(!settings.recentWallets) {
+        settings.recentWallets = []
     }
+    if(settings.recentWallets.includes(walletFile)) {
+        settings.recentWallets.splice( settings.recentWallets.indexOf(walletFile),1)
+    }
+    settings.recentWallets.unshift(walletFile)
+    if(settings.recentWallets.length > 10) {
+        settings.recentWallets = settings.recentWallets.slice(0, 10);
+    }
+    App.storeSettings()
+    App.win.setTitle("PHPCoin Wallet - [" + path.basename(walletFile) + "]")
+    App.state.walletData.loaded = true
+    App.updateStatus(null)
+    AppMenu.loadMenu()
 }
 
 async function getQrCode() {
@@ -279,7 +289,7 @@ async function send(arg) {
 
         await refresh()
 
-        dialog.showMessageBoxSync(win, {type:'info', title:'Success', message:'Your transaction is created'})
+        dialog.showMessageBoxSync(App.win, {type:'info', title:'Success', message:'Your transaction is created'})
         return tx
 
 
@@ -437,17 +447,20 @@ async function exportWallet() {
     }
 }
 
-async function openWalletFromFile() {
+async function openWalletFromDialog() {
     let filename = dialog.showOpenDialogSync(App.win, {
         filters: [{name: 'Wallet Files', extensions: ['dat']}]
     })
     if(filename) {
-        filename = filename [0]
-        await loadWallet(filename)
-        await getTransactions()
-        App.updateState()
-        App.goto('/')
+        await openWalletFromFile(filename[0]);
     }
+}
+
+async function openWalletFromFile(filename) {
+    await loadWallet(filename)
+    await getTransactions()
+    App.updateState()
+    App.goto('/')
 }
 
 async function newWallet() {
@@ -511,7 +524,7 @@ async function createMasternode(address) {
 
         let tx = await sendTx(amount, fee, dst, msg, type)
         await refresh()
-        dialog.showMessageBoxSync(win, {type:'info', title:'Success', message:'Your transaction is created'})
+        dialog.showMessageBoxSync(App.win, {type:'info', title:'Success', message:'Your transaction is created'})
         return tx
 
     } catch (e) {
@@ -537,7 +550,7 @@ async function removeMasternode(address) {
 
         await refresh()
 
-        dialog.showMessageBoxSync(win, {type:'info', title:'Success', message:'Your transaction is created'})
+        dialog.showMessageBoxSync(App.win, {type:'info', title:'Success', message:'Your transaction is created'})
         return tx
 
     } catch (e) {
@@ -569,6 +582,7 @@ export {
     setMempoolBalance,
     exportWallet,
     openWalletFromFile,
+    openWalletFromDialog,
     newWallet,
     sign,
     removeMasternode,

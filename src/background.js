@@ -8,7 +8,7 @@ import * as App from './App'
 import * as Wallet from './Wallet'
 import * as AppMenu from "./AppMenu";
 import * as Miner from "./Miner";
-import {win} from "./App";
+import {loadSettings, storeSettings, win} from "./App";
 import path from 'path'
 
 // Scheme must be registered before the app is ready
@@ -164,8 +164,9 @@ ipcMain.on('clipboard-copy', (event, text)=>{
   clipboard.writeText(text);
 })
 
-ipcMain.on('save-settings', (event, config)=>{
-  App.storeSettings(config)
+ipcMain.on('save-settings', (event, settings)=>{
+  App.state.settings = settings
+  App.storeSettings()
   App.updateState()
 })
 
