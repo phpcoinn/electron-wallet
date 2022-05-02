@@ -231,3 +231,7 @@ ipcMain.on("open-update-link", (event, data) => {
     shell.openExternal(url)
   }
 })
+
+ipcMain.on("get-fee", async (event, data)=>{
+  event.returnValue = await Wallet.getFee()
+})

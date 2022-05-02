@@ -24,8 +24,9 @@
                         <div class="fs-6" v-if="tx.type_label==='mempool'">Pending transaction</div>
                         <div class="text-muted small">{{tx.date|df}}</div>
                     </div>
-                    <div class="tx-val d-flex align-items-center p-2 fs-5">
-                        <span :class="tx.sign === '+' ? 'text-success' : 'text-danger'">{{tx.sign}}{{tx.val|num}}</span>
+                    <div class="tx-val d-flex flex-column align-items-end p-2 fs-5">
+                        <div :class="tx.sign === '+' ? 'text-success' : 'text-danger'">{{tx.sign}}{{tx.val|num}}</div>
+                        <div v-if="parseFloat(tx.fee) > 0" class="text-muted small">fee: {{tx.fee|num}}</div>
                     </div>
                 </div>
             </template>
@@ -61,6 +62,8 @@
                     <dd class="col-sm-9">{{selTransaction.dst}}</dd>
                     <dt class="col-sm-3">Value</dt>
                     <dd class="col-sm-9">{{selTransaction.val|num}}</dd>
+                    <dt class="col-sm-3">Fee</dt>
+                    <dd class="col-sm-9">{{selTransaction.fee|num}}</dd>
                     <dt class="col-sm-3">Message</dt>
                     <dd class="col-sm-9">{{selTransaction.message}}</dd>
                 </dl>

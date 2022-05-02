@@ -255,7 +255,7 @@ async function send(arg) {
     console.log(`Asking peer for pending balance url=${url}`)
 
     let amount = arg.amount
-    let fee = 0
+    let fee = arg.fee
 
     try {
 
@@ -270,6 +270,7 @@ async function send(arg) {
         let balance = await peerGet(url)
         balance = Number(balance)
         amount = Number(amount)
+        fee = Number(fee)
 
         if(balance < amount + fee) {
             throw new Error('Not enough funds in balance')
@@ -504,7 +505,8 @@ async function sendTx(amount, fee, dst, msg, type) {
         public_key: publicKey,
         type,
         message: msg,
-        date
+        date,
+        fee
     }
     let tx = await peerPost(url, {data: JSON.stringify(data)})
     return tx
@@ -560,6 +562,13 @@ async function removeMasternode(address) {
     }
 }
 
+async function getFee() {
+    let url = `${walletData.walletPeer}/api.php?q=getFee`
+    let res = await Axios.get(url)
+    console.log("call wallet getFee", url, res)
+    return res.data
+}
+
 export {
     loadWallet,
     deleteWallet,
@@ -587,4 +596,5 @@ export {
     sign,
     removeMasternode,
     createMasternode,
+    getFee
 }
