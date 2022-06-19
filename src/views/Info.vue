@@ -29,8 +29,15 @@
             <dl class="">
                 <dt class="">Public key:</dt>
                 <dd class="" style="word-break: break-all">{{$store.state.appState.walletData.publicKey}}</dd>
-                <dt class="">Private key:</dt>
-                <dd class="" style="word-break: break-all">{{$store.state.appState.walletData.privateKey}}</dd>
+                <dt class="">
+                    <div>
+                        Private key:
+                        <a href="" @click.prevent="toggleSecret">{{showSecret ? 'Hide' : 'Show'}}</a>
+                    </div>
+                </dt>
+                <dd style="word-break: break-all">
+                    <div :class="`secret ${showSecret ? 'show' : 'hide'}`">{{$store.state.appState.walletData.privateKey}}</div>
+                </dd>
             </dl>
         </div>
     </div>
@@ -41,14 +48,25 @@ import {ipcRenderer} from "electron";
 
 export default {
     name: "Info.vue",
+    data() {
+      return {
+          showSecret: false
+      }
+    },
     methods: {
         copy() {
             ipcRenderer.send('clipboard-copy', this.$store.state.appState.walletData.address)
+        },
+        toggleSecret() {
+            this.showSecret = !this.showSecret
         }
     }
 }
 </script>
 
 <style scoped>
-
+.secret.hide {
+    color: transparent !important;
+    text-shadow:  0 0 8px rgba(0,0,0,0.5)
+}
 </style>

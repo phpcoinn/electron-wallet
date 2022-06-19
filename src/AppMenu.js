@@ -95,6 +95,13 @@ function loadMenu() {
                         await Wallet.openWalletFromDialog()
                     }
                 },
+                {
+                    id: "import",
+                    label: "Import private key...",
+                    async click() {
+                        App.goto("/import_pk")
+                    }
+                },
                 recentMenu,
                 {
                     id: "save",

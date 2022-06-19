@@ -11,6 +11,7 @@ import About from '../views/About.vue'
 import Peers from '../views/Peers.vue'
 import Masternodes from '../views/Masternodes.vue'
 import Sign from '../views/Sign.vue'
+import ImportPrivateKey from '../views/ImportPrivateKey.vue'
 
 Vue.use(VueRouter)
 
@@ -69,6 +70,11 @@ const routes = [
     path: '/about',
     name: 'About',
     component: About
+  },
+  {
+    path: '/import_pk',
+    name: 'ImportPrivateKey',
+    component: ImportPrivateKey
   }
 ]
 

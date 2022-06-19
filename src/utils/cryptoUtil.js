@@ -32,6 +32,22 @@ let getAddress = (pubkey) => {
     return addressB58
 }
 
+let verifyAddress = (address) => {
+    let addressBin = Base58.decode(address)
+    let addressHex = Buffer.from(addressBin).toString('hex')
+    let addressChecksum = addressHex.substr(addressHex.length - 8, addressHex.length)
+    let baseAddress = addressHex.substr(0, addressHex.length-8)
+    if(baseAddress.substr(0,2)!==network_prefix) {
+        return false
+    }
+    let checksumCalc1 = crypto.createHash('sha256').update(baseAddress).digest('hex')
+    let checksumCalc2 = crypto.createHash('sha256').update(checksumCalc1).digest('hex')
+    let checksumCalc3 = crypto.createHash('sha256').update(checksumCalc2).digest('hex')
+    let checksum = checksumCalc3.substr(0, 8)
+    let valid = addressChecksum === checksum
+    return valid
+}
+
 function str_split (string, splitLength) { // eslint-disable-line camelcase
     //  discuss at: https://locutus.io/php/str_split/
     // original by: Martijn Wieringa
@@ -128,5 +144,22 @@ module.exports = {
         let decrypted = decipher.update(enc, 'base64', 'utf8')
         let wallet = (decrypted + decipher.final('utf8'))
         return wallet
+    },
+    importPrivateKey(privateKey) {
+        try {
+            let privateKeyPem = this.privateKeyToPem(privateKey)
+            let publicKeyDer = privateKeyPem.publicKey()
+            let publicKeyPem = publicKeyDer.toPem()
+            let publicKey = pem2coin(publicKeyPem)
+            let address = getAddress(publicKey)
+            if(!verifyAddress(address)) {
+                return false
+            }
+            return {
+                privateKey,publicKey,address
+            }
+        } catch (e) {
+            return false
+        }
     }
 }

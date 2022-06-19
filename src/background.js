@@ -151,6 +151,11 @@ ipcMain.on("encrypt-wallet", async (event, args) => {
   event.returnValue = res
 })
 
+ipcMain.on("import-private-key", async (event, args) => {
+  let res = await Wallet.importPrivateKey(args)
+  event.returnValue = res
+})
+
 ipcMain.on('exit-wallet', () => {
   app.quit()
 })

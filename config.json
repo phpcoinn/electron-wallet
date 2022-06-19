@@ -1,6 +1,5 @@
 {
     "network": "mainnet",
-    "version": "1.0.3",
     "testnet": {
         "miningNode": "https://miner1.testnet.phpcoin.net:8001",
         "walletNode": "https://wallet.testnet.phpcoin.net:8001",

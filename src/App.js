@@ -27,7 +27,8 @@ let state = {
         verifiedAddress: false,
         loaded: false,
         qrCode: null,
-        mempoolBalance: null
+        mempoolBalance: null,
+        peerInfo: {}
     },
     settings:{
         miningNode: config.miningNode,

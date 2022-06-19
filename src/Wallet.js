@@ -1,6 +1,7 @@
 import {shell} from "electron";
 import config from "../config.json";
 import path from "path";
+import {state, win} from "@/App";
 
 const fs = require("fs");
 const cryptoUtil = require("./utils/cryptoUtil");
@@ -12,8 +13,6 @@ const Axios = require('./utils/Axios')
 const QRCode = require('qrcode')
 
 let walletData = App.state.walletData
-
-let version = config.version
 
 function enableMenuItem(id, enabled) {
     let menuItem = AppMenu.findMenuItem(id)
@@ -170,9 +169,9 @@ function setMempoolBalance() {
 }
 
 function getPeerInfo() {
-    let url = `${walletData.walletPeer}/peer.php?q=currentBlock`
-    return peerPost(url, `coin=phpcoin&version=${version}`).then(res=>{
-        walletData.peerInfo = res.info
+    let url = `${walletData.walletPeer}/api.php?q=currentBlock`
+    return peerGet(url).then(res=>{
+        walletData.peerInfo.height = res.height
     })
 
 }
@@ -464,6 +463,34 @@ async function openWalletFromFile(filename) {
     App.goto('/')
 }
 
+async function importPrivateKey(privateKey) {
+    console.log("Import private key", privateKey)
+    let keys = cryptoUtil.importPrivateKey(privateKey)
+    if(!keys) {
+        return {error: true, msg: 'Can not import private key'}
+    } else {
+        let options = {
+            title: "Save imported private key to wallet",
+            defaultPath: keys.address + '.dat',
+            filters :[
+                {name: 'Wallet Files', extensions: ['dat']}
+            ]
+        }
+        let filename = dialog.showSaveDialogSync(App.win, options)
+        if(filename) {
+            App.updateStatus('Creating wallet')
+            let str = `phpcoin\n${keys.privateKey}\n${keys.publicKey}`
+            fs.writeFileSync(filename, str)
+            await loadWallet(filename)
+            await getTransactions()
+            App.updateState()
+            App.goto('/')
+        }
+    }
+
+    return true
+}
+
 async function newWallet() {
     let options = {
         title: "Create new PHP Coin Wallet file",
@@ -596,5 +623,6 @@ export {
     sign,
     removeMasternode,
     createMasternode,
-    getFee
+    getFee,
+    importPrivateKey
 }
