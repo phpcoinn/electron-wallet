@@ -4,13 +4,14 @@ import path from "path";
 import {state, win} from "@/App";
 
 const fs = require("fs");
-const cryptoUtil = require("./utils/cryptoUtil");
+const phpcoinCrypto = require("phpcoin-crypto")
 const App = require("./App");
 const AppMenu = require("./AppMenu");
 const app = require("electron").app
 const dialog = require('electron').dialog
 const Axios = require('./utils/Axios')
 const QRCode = require('qrcode')
+let network = config.network
 
 let walletData = App.state.walletData
 
@@ -45,7 +46,7 @@ async function loadWallet(file = null) {
             let parts = content.split("\n")
             walletData.privateKey = parts[1]
             walletData.publicKey = parts[2].trim()
-            walletData.address = cryptoUtil.getAddress(walletData.publicKey)
+            walletData.address = phpcoinCrypto.getAddress(walletData.publicKey, network)
             walletData.opened = true
             enableMenuItem('encrypt', true)
             enableMenuItem('decrypt', false)
@@ -58,7 +59,7 @@ async function loadWallet(file = null) {
     } else {
         enableMenuItem('encrypt', true)
         App.updateStatus('Creating wallet')
-        let keys = cryptoUtil.generateKeys()
+        let keys = phpcoinCrypto.generateAccount()
         let str = `phpcoin\n${keys.privateKey}\n${keys.publicKey}`
         App.updateStatus('Writing wallet...')
         fs.writeFileSync(walletFile, str)
@@ -70,7 +71,7 @@ async function loadWallet(file = null) {
             app.quit()
         }
 
-        let address = cryptoUtil.getAddress(keys.publicKey)
+        let address = phpcoinCrypto.getAddress(keys.publicKey, network)
         walletData.privateKey = keys.privateKey
         walletData.publicKey = keys.publicKey
         walletData.address = address
@@ -218,7 +219,7 @@ function openLoginLink() {
     let loginCode = Math.round(Math.random()*(999999-100000) + 100000)
     loginCode = `${loginCode}`
     console.log("loginCode", loginCode)
-    let signature = cryptoUtil.sign(loginCode, cryptoUtil.privateKeyToPem(walletData.privateKey))
+    let signature = phpcoinCrypto.sign(loginCode, walletData.privateKey)
     if(!signature) {
         App.showError("Error generating login link!")
         return
@@ -327,7 +328,7 @@ async function encryptWallet(password) {
         return errMsg( 'Wallet is already encrypted')
     }
 
-    str = cryptoUtil.encryptWallet(str, password)
+    str = phpcoinCrypto.encryptString(str, password)
     if(!str) {
         return errMsg('Error encrypting wallet!')
     }
@@ -360,7 +361,7 @@ async function openWallet(password) {
     }
     let decrypted
     try {
-        decrypted = cryptoUtil.decryptWallet(str, password)
+        decrypted = phpcoinCrypto.decryptString(str, password)
     } catch (e) {
         return errMsg( 'Error decrypting wallet')
     }
@@ -370,7 +371,7 @@ async function openWallet(password) {
     let parts = decrypted.split("\n")
     walletData.privateKey = parts[1]
     walletData.publicKey = parts[2].trim()
-    walletData.address = cryptoUtil.getAddress(walletData.publicKey)
+    walletData.address = phpcoinCrypto.getAddress(walletData.publicKey, network)
     await loadWallet()
     await getTransactions()
     return true
@@ -465,7 +466,7 @@ async function openWalletFromFile(filename) {
 
 async function importPrivateKey(privateKey) {
     console.log("Import private key", privateKey)
-    let keys = cryptoUtil.importPrivateKey(privateKey)
+    let keys = phpcoinCrypto.importPrivateKey(privateKey)
     if(!keys) {
         return {error: true, msg: 'Can not import private key'}
     } else {
@@ -502,7 +503,7 @@ async function newWallet() {
     let filename = dialog.showSaveDialogSync(App.win, options)
     if(filename) {
         App.updateStatus('Creating wallet')
-        let keys = cryptoUtil.generateKeys()
+        let keys = phpcoinCrypto.generateAccount()
         let str = `phpcoin\n${keys.privateKey}\n${keys.publicKey}`
         fs.writeFileSync(filename, str)
         await loadWallet(filename)
@@ -513,7 +514,7 @@ async function newWallet() {
 }
 
 function sign(message) {
-    let signature = cryptoUtil.sign(message, cryptoUtil.privateKeyToPem(walletData.privateKey))
+    let signature = phpcoinCrypto.sign(message, walletData.privateKey)
     return signature
 }
 
@@ -522,7 +523,7 @@ async function sendTx(amount, fee, dst, msg, type) {
     let date = Math.round(new Date().getTime()/1000)
     let txData = `${amount}-${fee}-${dst}-${msg}-${type}-${publicKey}-${date}`
 
-    let signature = cryptoUtil.sign(txData, cryptoUtil.privateKeyToPem(walletData.privateKey))
+    let signature = phpcoinCrypto.sign(txData, walletData.privateKey)
 
     let url = `${walletData.walletPeer}/api.php?q=send`
     let data = {
