@@ -33,6 +33,11 @@
                         This node will receive 10% of block reward
                     </span>
                 </div>
+                <div class="col-sm-2"></div>
+                <div class="col-sm-6">
+                    <input type="checkbox" v-model="settings.autoStartMiner">
+                    Start mining on wallet start
+                </div>
             </div>
 
         </form>

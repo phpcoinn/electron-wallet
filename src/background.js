@@ -107,6 +107,11 @@ app.on('ready', async () => {
       await Wallet.refresh()
     }, 30000)
 
+    setTimeout(()=> {
+      Wallet.checkAndStartMiner()
+    }, 1000)
+
+
   } catch (e) {
     throw new Error("Unable to load wallet: " + e)
   }
@@ -172,7 +177,7 @@ ipcMain.on('clipboard-copy', (event, text)=>{
 ipcMain.on('save-settings', (event, settings)=>{
   App.state.settings = settings
   App.storeSettings()
-  App.updateState()
+  Wallet.setWalletPeer()
 })
 
 ipcMain.on('show-context-menu', (event, data)=>{

@@ -2,6 +2,7 @@ import {shell} from "electron";
 import config from "../config.json";
 import path from "path";
 import {state, win} from "@/App";
+import * as Miner from "./Miner";
 
 const fs = require("fs");
 const phpcoinCrypto = require("phpcoin-crypto")
@@ -597,7 +598,15 @@ async function getFee() {
     return res.data
 }
 
+function checkAndStartMiner() {
+    let autoStartMiner = App.state.settings.autoStartMiner
+    if(autoStartMiner) {
+        Miner.start()
+    }
+}
+
 export {
+    checkAndStartMiner,
     loadWallet,
     deleteWallet,
     peerGet,
