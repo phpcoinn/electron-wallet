@@ -13,6 +13,7 @@ const dialog = require('electron').dialog
 const Axios = require('./utils/Axios')
 const QRCode = require('qrcode')
 let network = config.network
+let chainId = config[network].chainId
 
 let walletData = App.state.walletData
 
@@ -220,7 +221,7 @@ function openLoginLink() {
     let loginCode = Math.round(Math.random()*(999999-100000) + 100000)
     loginCode = `${loginCode}`
     console.log("loginCode", loginCode)
-    let signature = phpcoinCrypto.sign(loginCode, walletData.privateKey)
+    let signature = sign(loginCode)
     if(!signature) {
         App.showError("Error generating login link!")
         return
@@ -515,30 +516,43 @@ async function newWallet() {
 }
 
 function sign(message) {
-    let signature = phpcoinCrypto.sign(message, walletData.privateKey)
+    let signature = phpcoinCrypto.sign(chainId + message, walletData.privateKey)
     return signature
 }
 
 async function sendTx(amount, fee, dst, msg, type) {
     let publicKey = walletData.publicKey
-    let date = Math.round(new Date().getTime()/1000)
-    let txData = `${amount}-${fee}-${dst}-${msg}-${type}-${publicKey}-${date}`
-
-    let signature = phpcoinCrypto.sign(txData, walletData.privateKey)
-
-    let url = `${walletData.walletPeer}/api.php?q=send`
-    let data = {
+    let tx = {
         dst,
         val: amount,
-        signature,
         public_key: publicKey,
         type,
         message: msg,
-        date,
         fee
     }
-    let tx = await peerPost(url, {data: JSON.stringify(data)})
-    return tx
+    return await signAndSend(tx)
+}
+
+async function signAndSend(tx) {
+    if(!tx.public_key) {
+        tx.public_key = walletData.publicKey
+    }
+    if(!tx.date) {
+        tx.date = Math.round(new Date().getTime()/1000)
+    }
+    if(!tx.src) {
+        tx.src = walletData.address
+    }
+    tx.val = Number(tx.val).toFixed(8)
+    tx.fee = Number(tx.fee).toFixed(8)
+    let txData = `${tx.val}-${tx.fee}-${tx.dst}-${tx.message}-${tx.type}-${tx.public_key}-${tx.date}`
+    let signature = sign(txData)
+    tx.signature = signature
+
+    let url = `${walletData.walletPeer}/api.php?q=sendTransaction&tx=` + Buffer.from(JSON.stringify(tx)).toString('base64')
+    console.log(url)
+    let res = await peerGet(url)
+    return res
 }
 
 async function createMasternode(address) {
@@ -634,5 +648,6 @@ export {
     removeMasternode,
     createMasternode,
     getFee,
-    importPrivateKey
+    importPrivateKey,
+    signAndSend
 }

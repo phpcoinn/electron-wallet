@@ -9,7 +9,8 @@
         "walletUrl": "https://wallet.testnet.phpcoin.net:8001",
         "block_time": 30,
         "network_prefix": "30",
-        "masternode_collateral": 1000
+        "masternode_collateral": 1000,
+        "chainId": ""
     },
     "mainnet": {
         "miningNode": "https://miner1.phpcoin.net",
@@ -24,6 +25,7 @@
         "updateLink": {
             "linux": "https://phpcoin.net/download/phpcoin-wallet-linux",
             "win32": "https://phpcoin.net/download/phpcoin-wallet-win.exe"
-        }
+        },
+        "chainId": ""
     }
 }
