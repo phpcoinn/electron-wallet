@@ -59,6 +59,9 @@ export default {
           return this.$store.state.appState.settings
       }
     },
+    mounted() {
+        ipcRenderer.removeAllListeners('state-update')
+    },
     methods:{
         save() {
             ipcRenderer.send('save-settings', this.settings)
