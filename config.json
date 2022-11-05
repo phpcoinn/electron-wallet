@@ -10,7 +10,7 @@
         "block_time": 30,
         "network_prefix": "30",
         "masternode_collateral": 1000,
-        "chainId": ""
+        "chainId": "99"
     },
     "mainnet": {
         "miningNode": "https://miner1.phpcoin.net",
@@ -26,6 +26,6 @@
             "linux": "https://phpcoin.net/download/phpcoin-wallet-linux",
             "win32": "https://phpcoin.net/download/phpcoin-wallet-win.exe"
         },
-        "chainId": ""
+        "chainId": "01"
     }
 }
