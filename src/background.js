@@ -208,6 +208,11 @@ ipcMain.on("open-url", (event, url) => {
   shell.openExternal(url)
 })
 
+ipcMain.on("open-explorer-url", (event, url) => {
+  url = App.config.walletUrl + '/apps/explorer/' + url
+  shell.openExternal(url)
+})
+
 ipcMain.on("get-masternodes", async (event, data)=>{
   let res = await Wallet.getMasternodes()
   event.returnValue = res
