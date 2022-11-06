@@ -8,7 +8,7 @@
         "aboutUrl": "https://phpcoin.net",
         "walletUrl": "https://wallet.testnet.phpcoin.net:8001",
         "block_time": 30,
-        "network_prefix": "30",
+        "network_prefix": "38",
         "masternode_collateral": 1000,
         "chainId": "99"
     },
