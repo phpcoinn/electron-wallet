@@ -108,6 +108,7 @@ async function loop() {
             let nodeTime = info.time
             let data = info.data
             let block = info.block
+            let chain_id = info.chain_id
             let offset = nodeTime - now
             let elapsed = 0
             let new_block_date
@@ -216,7 +217,7 @@ async function loop() {
                 })
                 //console.log("argon2 hash", argon)
 
-                nonceBase = `${address}-${block_date}-${elapsed}-${argon}`
+                nonceBase = `${chain_id}${address}-${block_date}-${elapsed}-${argon}`
 
                 calcNonce = sha256(nonceBase)
 
