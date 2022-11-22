@@ -106,7 +106,6 @@ async function loop() {
             let block_date = parseInt(info.date)
             let now = Math.round(Date.now() / 1000)
             let nodeTime = info.time
-            let data = info.data
             let block = info.block
             let chain_id = info.chain_id
             let offset = nodeTime - now
@@ -149,7 +148,6 @@ async function loop() {
                 hit,
                 target,
                 blockFound,
-                data,
                 signatureBase,
                 signature,
                 json,
@@ -159,10 +157,6 @@ async function loop() {
                 attempt,
                 runningTime,
                 block
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                data = {}
             }
 
             let t1 = Date.now()
@@ -238,6 +232,7 @@ async function loop() {
                 if (target > maxTarget) {
                     maxTarget = target
                 }
+                // if(target > 100) target = 100
                 blockFound = (hit > 0 && target > 0 && hit > target)
                 // console.log(`attempt=${attempt} block_time=${block_time} elapsed=${elapsed} difficulty=${difficulty} hit=${hit} target=${target} blockFound=${blockFound}`)
 
@@ -260,7 +255,6 @@ async function loop() {
                 difficulty,
                 address,
                 date: new_block_date,
-                data: JSON.stringify(data),
                 elapsed,
                 minerInfo: 'electron-wallet ' + App.state.info.version
             }
