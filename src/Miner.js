@@ -232,7 +232,7 @@ async function loop() {
                 if (target > maxTarget) {
                     maxTarget = target
                 }
-                // if(target > 100) target = 100
+                if(App.state.settings.development && target > 100) target = 100
                 blockFound = (hit > 0 && target > 0 && hit > target)
                 // console.log(`attempt=${attempt} block_time=${block_time} elapsed=${elapsed} difficulty=${difficulty} hit=${hit} target=${target} blockFound=${blockFound}`)
 
