@@ -560,7 +560,7 @@ async function createMasternode(address) {
     let fee = 0
 
     try {
-        let amount = App.config.masternode_collateral
+        let amount = await getMasternodeCollateral()
         let msg ='mncreate'
         amount = Number(amount).toFixed(8)
         fee = Number(fee).toFixed(8)
@@ -581,7 +581,7 @@ async function createMasternode(address) {
 
 async function removeMasternode(address) {
     console.log("call wallet-remove-masternode")
-    let amount = App.config.masternode_collateral
+    let amount = await getMasternodeCollateral()
     let fee = 0
     try {
 
@@ -609,6 +609,13 @@ async function getFee() {
     let url = `${walletData.walletPeer}/api.php?q=getFee`
     let res = await Axios.get(url)
     console.log("call wallet getFee", url, res)
+    return res.data
+}
+
+async function getMasternodeCollateral() {
+    let url = `${walletData.walletPeer}/api.php?q=getCollateral`
+    let res = await Axios.get(url)
+    console.log("call wallet getMasternodeCollateral", url, res)
     return res.data
 }
 
