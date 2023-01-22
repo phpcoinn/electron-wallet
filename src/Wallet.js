@@ -581,7 +581,7 @@ async function createMasternode(address) {
 
 async function removeMasternode(address) {
     console.log("call wallet-remove-masternode")
-    let amount = await getMasternodeCollateral()
+    let amount = await getMasternodeForAddress(walletData.address)
     let fee = 0
     try {
 
@@ -617,6 +617,13 @@ async function getMasternodeCollateral() {
     let res = await Axios.get(url)
     console.log("call wallet getMasternodeCollateral", url, res)
     return res.data
+}
+
+async function getMasternodeForAddress(mnAddress) {
+    let url = `${walletData.walletPeer}/api.php?q=getMasternode&address=${mnAddress}`
+    let res = await Axios.get(url)
+    console.log("call wallet getMasternodeForAddress", url, res)
+    return res.data.collateral
 }
 
 function checkAndStartMiner() {
