@@ -6,7 +6,7 @@
     "name": "PHPCoin",
     "url": "https://phpcoin.net"
   },
-  "version": "1.0.25",
+  "version": "1.0.26",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
