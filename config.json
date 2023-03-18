@@ -17,12 +17,12 @@
             "chainId": "01"
         },
         "mainnet": {
-            "miningNode": "http://spectre:8000",
-            "walletNode": "http://spectre:8000",
-            "faucetLink": "http://spectre:8000",
-            "peersUrl": "http://spectre:8000/peers.php",
+            "miningNode": "https://miner.phpcoin.net",
+            "walletNode": "https://main.phpcoin.net",
+            "faucetLink": "https://main.phpcoin.net",
+            "peersUrl": "https://main.phpcoin.net/peers.php",
             "aboutUrl": "https://phpcoin.net",
-            "walletUrl": "http://spectre:8000",
+            "walletUrl": "https://main.phpcoin.net",
             "block_time": 60,
             "chain_prefix": "38",
             "updateLink": {
