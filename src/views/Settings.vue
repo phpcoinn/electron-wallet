@@ -10,6 +10,19 @@
 
         <form class="row flex-grow-1 d-flex align-content-start p-3">
             <div class="row mb-3">
+                <label for="miningNode" class="col-sm-2 col-form-label">Network:</label>
+                <div class="col-sm-6">
+                    <select class="form-control" v-model="settings.network">
+                        <option v-for="network in networks" :key="network" :value="network" :label="network"></option>
+                    </select>
+                </div>
+                <div class="col-sm-4">
+                    <span class="col-form-label text-danger">
+                        After changing network wallet will be restarted and default servers will be set
+                    </span>
+                </div>
+            </div>
+            <div class="row mb-3">
                 <label for="miningNode" class="col-sm-2 col-form-label">Wallet node:</label>
                 <div class="col-sm-6">
                     <input type="checkbox" v-model="settings.autoWalletNode"> Automatic
@@ -57,7 +70,10 @@ export default {
     computed: {
       settings() {
           return this.$store.state.appState.settings
-      }
+      },
+        networks() {
+            return this.$store.state.appState.networks
+        }
     },
     mounted() {
         ipcRenderer.removeAllListeners('state-update')

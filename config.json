@@ -1,29 +1,35 @@
 {
-    "network": "mainnet",
-    "testnet": {
-        "miningNode": "https://miner1.testnet.phpcoin.net:8001",
-        "walletNode": "https://wallet.testnet.phpcoin.net:8001",
-        "faucetLink": "https://node1.testnet.phpcoin.net:8001/apps/faucet",
-        "peersUrl": "https://node1.testnet.phpcoin.net:8001/peers.php",
-        "aboutUrl": "https://phpcoin.net",
-        "walletUrl": "https://wallet.testnet.phpcoin.net:8001",
-        "block_time": 30,
-        "chain_prefix": "38",
-        "chainId": "99"
-    },
-    "mainnet": {
-        "miningNode": "https://miner1.phpcoin.net",
-        "walletNode": "https://wallet.phpcoin.net",
-        "faucetLink": "https://faucet.phpcoin.net/apps/faucet",
-        "peersUrl": "https://node1.phpcoin.net/peers.php",
-        "aboutUrl": "https://phpcoin.net",
-        "walletUrl": "https://wallet.phpcoin.net",
-        "block_time": 60,
-        "chain_prefix": "38",
-        "updateLink": {
-            "linux": "https://phpcoin.net/download/phpcoin-wallet-linux",
-            "win32": "https://phpcoin.net/download/phpcoin-wallet-win.exe"
+    "defaultNetwork": "mainnet-alpha",
+    "networks": {
+        "mainnet-alpha": {
+            "miningNode": "https://miner1.phpcoin.net",
+            "walletNode": "https://wallet.phpcoin.net",
+            "faucetLink": "https://faucet.phpcoin.net/apps/faucet",
+            "peersUrl": "https://node1.phpcoin.net/peers.php",
+            "aboutUrl": "https://phpcoin.net",
+            "walletUrl": "https://wallet.phpcoin.net",
+            "block_time": 60,
+            "chain_prefix": "38",
+            "updateLink": {
+                "linux": "https://phpcoin.net/download/phpcoin-wallet-linux",
+                "win32": "https://phpcoin.net/download/phpcoin-wallet-win.exe"
+            },
+            "chainId": "01"
         },
-        "chainId": "01"
+        "mainnet": {
+            "miningNode": "http://spectre:8000",
+            "walletNode": "http://spectre:8000",
+            "faucetLink": "http://spectre:8000",
+            "peersUrl": "http://spectre:8000/peers.php",
+            "aboutUrl": "https://phpcoin.net",
+            "walletUrl": "http://spectre:8000",
+            "block_time": 60,
+            "chain_prefix": "38",
+            "updateLink": {
+                "linux": "https://phpcoin.net/download/phpcoin-wallet-linux",
+                "win32": "https://phpcoin.net/download/phpcoin-wallet-win.exe"
+            },
+            "chainId": "00"
+        }
     }
 }

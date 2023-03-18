@@ -12,8 +12,8 @@ const app = require("electron").app
 const dialog = require('electron').dialog
 const Axios = require('./utils/Axios')
 const QRCode = require('qrcode')
-let network = config.network
-let chainId = config[network].chainId
+let network = App.network
+let chainId = App.config.chainId
 
 let walletData = App.state.walletData
 

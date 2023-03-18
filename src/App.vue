@@ -32,7 +32,8 @@
                 </router-link>
             </div>
             <div class="app-ver text-white-50 text-center mt-auto" v-if="$store && $store.state && $store.state.appState && $store.state.appState.info">
-                {{$store.state.appState.info.version}}
+                <div>{{$store.state.appState.info.network}}</div>
+                <div>{{$store.state.appState.info.version}}</div>
                 <span class="badge bg-success" style="cursor: pointer" @click="openUpdateUrl()" v-if="hasUpdate()">
                    Update available
                </span>

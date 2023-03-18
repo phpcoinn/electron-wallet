@@ -1,16 +1,24 @@
-import {dialog} from "electron";
+import {app, dialog} from "electron";
 import { exec } from "child_process";
 import * as Axios from "@/utils/Axios";
 
 const fs = require("fs")
 const path = require("path")
 
-let config = require("../config.json")
+let appConfig = require("../config.json")
 let pckg = require("../package.json")
+let settingsFile = path.join(process.cwd(), 'settings.json')
+let settings = {}
+if(fs.existsSync(settingsFile)) {
+    settings = fs.readFileSync(settingsFile, 'utf8')
+    settings = JSON.parse(settings)
+}
 let version = pckg.version
-let network = config.network
-console.log("network",network)
-config = config[network]
+let network = settings.network || appConfig.defaultNetwork
+console.log({network})
+let networks = Object.keys(appConfig.networks)
+let config = appConfig.networks[network]
+
 
 let state = {
     walletData: {
@@ -33,8 +41,10 @@ let state = {
     settings:{
         miningNode: config.miningNode,
         autoWalletNode: true,
-        walletNode: config.walletNode
+        walletNode: config.walletNode,
+        network: network
     },
+    networks: networks,
     transactions: [],
     minerData: {
         status: null,
@@ -107,8 +117,19 @@ async function getLatestVersion() {
 }
 
 function storeSettings() {
+
+    let exit
+    if(state.settings.network !== network) {
+        state.settings.miningNode = appConfig.networks[state.settings.network].miningNode
+        state.settings.walletNode = appConfig.networks[state.settings.network].walletNode
+        exit = true
+    }
+
     let settingsFile = path.join(process.cwd(), 'settings.json')
     fs.writeFileSync(settingsFile, JSON.stringify(state.settings, null, 4))
+    if(exit) {
+        app.quit()
+    }
 }
 
 function showError(message) {
@@ -117,8 +138,12 @@ function showError(message) {
 
 function updateState() {
     // console.log("SEND STATE UPDATE", state.minerData)
-    if(win &&  win.webContents) {
-        win.webContents.send("state-update", state)
+    try {
+        if(win && state && win.webContents) {
+            win.webContents.send("state-update", state)
+        }
+    } catch (e) {
+        console.error(e)
     }
 }
 
@@ -140,5 +165,6 @@ export {
     updateState,
     config,
     getLatestVersion,
-    clearRecentFilesList
+    clearRecentFilesList,
+    network
 }
