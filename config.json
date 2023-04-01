@@ -1,5 +1,5 @@
 {
-    "defaultNetwork": "mainnet-alpha",
+    "defaultNetwork": "mainnet",
     "networks": {
         "mainnet-alpha": {
             "miningNode": "https://miner1.phpcoin.net",
@@ -17,12 +17,12 @@
             "chainId": "01"
         },
         "mainnet": {
-            "miningNode": "https://miner.phpcoin.net",
-            "walletNode": "https://main.phpcoin.net",
-            "faucetLink": "https://main.phpcoin.net",
-            "peersUrl": "https://main.phpcoin.net/peers.php",
+            "miningNode": "https://m1.phpcoin.net",
+            "walletNode": "https://main1.phpcoin.net",
+            "faucetLink": "https://main1.phpcoin.net",
+            "peersUrl": "https://main1.phpcoin.net/peers.php",
             "aboutUrl": "https://phpcoin.net",
-            "walletUrl": "https://main.phpcoin.net",
+            "walletUrl": "https://main1.phpcoin.net",
             "block_time": 60,
             "chain_prefix": "38",
             "updateLink": {
