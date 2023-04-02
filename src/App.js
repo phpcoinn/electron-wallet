@@ -7,7 +7,7 @@ const path = require("path")
 
 let appConfig = require("../config.json")
 let pckg = require("../package.json")
-let settingsFile = path.join(process.cwd(), 'settings.json')
+let settingsFile = path.join(app.getPath("userData"),'settings.json')
 let settings = {}
 if(fs.existsSync(settingsFile)) {
     settings = fs.readFileSync(settingsFile, 'utf8')
@@ -36,11 +36,12 @@ let state = {
         loaded: false,
         qrCode: null,
         mempoolBalance: null,
-        peerInfo: {}
+        peerInfo: {},
     },
+    settingsFile: settingsFile,
     settings:{
         miningNode: config.miningNode,
-        autoWalletNode: true,
+        autoWalletNode: false,
         walletNode: config.walletNode,
         network: network
     },
@@ -94,7 +95,6 @@ function goto(url) {
 }
 
 function loadSettings() {
-    let settingsFile = path.join(process.cwd(), 'settings.json')
     let settings = {}
     if(fs.existsSync(settingsFile)) {
         settings = fs.readFileSync(settingsFile, 'utf8')
@@ -125,7 +125,7 @@ function storeSettings() {
         exit = true
     }
 
-    let settingsFile = path.join(process.cwd(), 'settings.json')
+	console.log("SETTINGS FILE: " + settingsFile);
     fs.writeFileSync(settingsFile, JSON.stringify(state.settings, null, 4))
     if(exit) {
         app.quit()
