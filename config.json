@@ -1,7 +1,7 @@
 {
     "defaultNetwork": "mainnet",
     "networks": {
-        "mainnet-alpha": {
+        "testnet": {
             "miningNode": "https://miner1.phpcoin.net",
             "walletNode": "https://wallet.phpcoin.net",
             "faucetLink": "https://faucet.phpcoin.net/apps/faucet",
