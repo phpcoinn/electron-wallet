@@ -14,6 +14,9 @@ if(fs.existsSync(settingsFile)) {
     settings = JSON.parse(settings)
 }
 let version = pckg.version
+if(settings.network === 'mainnet-alpha') {
+    settings.network = 'testnet'
+}
 let network = settings.network || appConfig.defaultNetwork
 console.log({network})
 let networks = Object.keys(appConfig.networks)
