@@ -102,6 +102,9 @@ function loadSettings() {
     if(fs.existsSync(settingsFile)) {
         settings = fs.readFileSync(settingsFile, 'utf8')
         settings = JSON.parse(settings)
+        if(settings.network === 'mainnet-alpha') {
+            settings.network = 'testnet'
+        }
     }
     for(let i in settings) {
         state.settings[i] = settings[i]
