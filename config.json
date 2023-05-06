@@ -3,11 +3,11 @@
     "networks": {
         "testnet": {
             "miningNode": "https://miner1.phpcoin.net",
-            "walletNode": "https://wallet.phpcoin.net",
-            "faucetLink": "https://faucet.phpcoin.net/apps/faucet",
+            "walletNode": "https://node1.phpcoin.net",
+            "faucetLink": "https://node1.phpcoin.net/apps/faucet",
             "peersUrl": "https://node1.phpcoin.net/peers.php",
             "aboutUrl": "https://phpcoin.net",
-            "walletUrl": "https://wallet.phpcoin.net",
+            "walletUrl": "https://node1.phpcoin.net",
             "block_time": 60,
             "chain_prefix": "38",
             "updateLink": {
