@@ -21,11 +21,16 @@ let cpu = 0
 
 let updateUiTimer
 let mineInfoTimer
+let sendStatTimer
+
+let minerid
+let prevHashes
 
 function start() {
 
     startTime = Date.now()
-
+    minerid = Math.round(Date.now()/1000) + Math.random().toString(16).slice(2)
+    prevHashes = 0
 
     new Promise(async (resolve, reject) => {
 
@@ -59,6 +64,20 @@ function start() {
         })
 
     }, 10000)
+
+    sendStatTimer =setInterval(()=>{
+        let response
+        try {
+            let address = App.state.walletData.address
+            let hashes = minerData.miningStat.hashes - prevHashes
+            prevHashes = minerData.miningStat.hashes
+            let height = minerData.miningStat.height
+            let postData = {address, minerid,cpu, hashes, height, interval: 60, miner_type: 'gui-wallet', version:App.state.info.version}
+            response = Axios.post(App.state.settings.miningNode + '/mine.php?q=submitStat', postData)
+        } catch (e) {
+            console.error("ERROR", e)
+        }
+    }, 60000)
 
 }
 
@@ -191,6 +210,7 @@ async function loop() {
                 minerData.miner.elapsed = elapsed
                 minerData.miner.attempt = attempt
                 minerData.miner.new_block_date = new_block_date
+                minerData.miningStat.height = height
 
                 let salt = Buffer.from(address.substr(0, 16))
                 if(info.hashingOptions) {
@@ -349,6 +369,7 @@ function stop() {
     minerData.status = "Stoping miner"
     clearInterval(updateUiTimer)
     clearInterval(mineInfoTimer)
+    clearInterval(sendStatTimer)
     minerData.running = false
     updateUi()
 }

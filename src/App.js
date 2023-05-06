@@ -70,6 +70,7 @@ let state = {
             dropped: 0,
             nodeStatus: null,
             speed: 0,
+            height: null
         },
         logs: []
     },
