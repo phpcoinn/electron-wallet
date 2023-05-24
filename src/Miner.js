@@ -4,6 +4,7 @@ import * as argon2 from "argon2"
 import crypto from "crypto";
 import * as Axios from "./utils/Axios";
 import {dialog} from "electron";
+import {config} from "@/App";
 
 
 let minerData = App.state.minerData
@@ -72,7 +73,8 @@ function start() {
             let hashes = minerData.miningStat.hashes - prevHashes
             prevHashes = minerData.miningStat.hashes
             let height = minerData.miningStat.height
-            let postData = {address, minerid,cpu, hashes, height, interval: 60, miner_type: 'gui-wallet', version:App.state.info.version}
+            let postData = {address, minerid,cpu, hashes, height, interval: 60, miner_type: 'gui-wallet', version: config.minerVersion,
+                minerInfo: 'electron-wallet ' + App.state.info.version}
             response = Axios.post(App.state.settings.miningNode + '/mine.php?q=submitStat', postData)
         } catch (e) {
             console.error("ERROR", e)
@@ -276,7 +278,8 @@ async function loop() {
                 address,
                 date: new_block_date,
                 elapsed,
-                minerInfo: 'electron-wallet ' + App.state.info.version
+                minerInfo: 'electron-wallet ' + App.state.info.version,
+                version: config.minerVersion
             }
 
 

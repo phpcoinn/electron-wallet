@@ -14,7 +14,8 @@
                 "linux": "https://phpcoin.net/download/phpcoin-wallet-linux",
                 "win32": "https://phpcoin.net/download/phpcoin-wallet-win.exe"
             },
-            "chainId": "01"
+            "chainId": "01",
+            "minerVersion": "1.2"
         },
         "mainnet": {
             "miningNode": "https://m1.phpcoin.net",
@@ -29,7 +30,8 @@
                 "linux": "https://phpcoin.net/download/phpcoin-wallet-linux",
                 "win32": "https://phpcoin.net/download/phpcoin-wallet-win.exe"
             },
-            "chainId": "00"
+            "chainId": "00",
+            "minerVersion": "1.2"
         }
     }
 }
