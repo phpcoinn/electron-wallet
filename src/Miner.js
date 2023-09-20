@@ -27,6 +27,12 @@ let sendStatTimer
 let minerid
 let prevHashes
 
+let hashingTime = 0
+let hashingCnt = 0
+let speed
+let sleepTime
+let attempt
+
 function start() {
 
     startTime = Date.now()
@@ -100,10 +106,43 @@ function hexToDec(s) {
     return digits.reverse().join('');
 }
 
+function measureSpeed(t1, th) {
+    let t2 = Date.now()
+    hashingCnt++
+    hashingTime = hashingTime + (t2-th)
+    let diff = (t2-t1)/1000
+    speed = Number(attempt/diff).toFixed(2)
+    let calcCount = Math.round(speed * 60)
+    let mod = hashingCnt % calcCount
+    if(mod === 0) {
+        sleepTime = cpu === 0 ? Infinity : Math.round(((hashingTime/hashingCnt))*(100-cpu)/cpu)
+        if(sleepTime < 0) {
+            sleepTime = 0
+        }
+    }
+    // console.log({cpu,t1,th,hashingCnt,hashingTime,diff,speed,calcCount,rem:hashingCnt/calcCount,sleepTime})
+}
+
+async function sendHash(miningNode, postData) {
+    try {
+        let response = await Axios.post(miningNode + '/mine.php?q=submitHash', postData)
+        console.log("sendHash to " + miningNode + ' response=' + JSON.stringify(response))
+        return response
+    } catch (e) {
+        console.error("ERROR", e)
+    }
+    return false
+}
+
 async function loop() {
 
     console.log("start loop")
     let max = hexToDec('FFFFFFFF') * 1000
+
+    // sleepTime = (100 - cpu) * 5
+
+    let miningNodes = await getMiningNodes()
+    // console.log({miningNodes})
 
     while(minerData.running) {
 
@@ -146,7 +185,7 @@ async function loop() {
             let blockFound = false
             let times = {}
             let version = info.version
-            let attempt = 0
+            attempt = 0
             let runningTime
 
             minerData.miner = {
@@ -194,14 +233,20 @@ async function loop() {
                 }
 
                 attempt++
+
+                if(sleepTime === Infinity) {
+                    minerData.running = false
+                    break
+                }
+
                 minerData.miningStat.hashes++
 
                 let t2 = Date.now()
                 let diff = t2 - t1
-                minerData.miningStat.speed = ( attempt / (diff / 1000)).toFixed(2)
+                // minerData.miningStat.speed = ( attempt / (diff / 1000)).toFixed(2)
 
-                let ms = (100 - cpu) * 5
-                await new Promise(resolve => setTimeout(resolve, ms));
+                // let ms = sleepTime * 1000
+                await new Promise(resolve => setTimeout(resolve, sleepTime));
                 now = Math.round(Date.now() / 1000)
                 elapsed = now + offset - block_date
 
@@ -223,6 +268,7 @@ async function loop() {
                     salt = Buffer.from(salt)
                 }
 
+                let th = Date.now()
                 argon = await argon2.hash(argonBase, {
                     salt,
                     memoryCost: hashingConfig.mem,
@@ -256,13 +302,17 @@ async function loop() {
                 }
                 if(App.state.settings.development && target > 100) target = 100
                 blockFound = (hit > 0 && target > 0 && hit > target)
-                // console.log(`attempt=${attempt} block_time=${block_time} elapsed=${elapsed} difficulty=${difficulty} hit=${hit} target=${target} blockFound=${blockFound}`)
 
                 minerData.miner.hit = hit
                 minerData.miner.maxHit = maxHit
                 minerData.miner.target = target
                 minerData.miner.maxTarget = maxTarget
                 minerData.miner.runningTime = Date.now() - startTime
+
+                measureSpeed(t1, th)
+                //console.log(`attempt=${attempt} block_time=${block_time} elapsed=${elapsed} difficulty=${difficulty} hit=${hit} target=${target} blockFound=${blockFound} speed=${speed}`)
+                minerData.miningStat.speed = speed
+
             }
 
             if (!blockFound || elapsed<=0) {
@@ -283,37 +333,46 @@ async function loop() {
             }
 
 
-            console.log("postData", App.state.settings.miningNode)
-            let response
-            try {
-                response = await Axios.post(App.state.settings.miningNode + '/mine.php?q=submitHash', postData)
-            } catch (e) {
-                console.error("ERROR", e)
-            }
-            if (response) {
-                if (response.status === 'ok') {
-                    minerData.miningStat.accepted++
-                    minerData.logs.unshift({
-                        type: 'success',
-                        time: Date.now(),
-                        title: 'Hash accepted',
-                        message: response.data
-                    })
-                    await Wallet.refresh()
-                } else {
-                    // console.log(JSON.stringify(response))
-                    minerData.miningStat.rejected++
-                    minerData.miningStat.rejectedReason = response.data
-                    minerData.logs.unshift({
-                        type: 'danger',
-                        time: Date.now(),
-                        title: 'Hash rejected',
-                        message: response.data
-                    })
-                }
+
+
+
+            // console.log("postData", App.state.settings.miningNode)
+            let response = await sendHash(App.state.settings.miningNode, postData)
+            let accepted = false
+
+            if (response && response.status === 'ok') {
+                accepted = true
             } else {
+                if(miningNodes && miningNodes.length > 0) {
+                    for (let miningNode of miningNodes) {
+                        response = await sendHash(miningNode, postData)
+                        if (response && response.status === 'ok') {
+                            accepted = true
+                            break
+                        }
+                    }
+                }
+            }
+
+            if (accepted) {
+                minerData.miningStat.accepted++
+                minerData.logs.unshift({
+                    type: 'success',
+                    time: Date.now(),
+                    title: 'Hash accepted',
+                    message: response.data
+                })
+                await Wallet.refresh()
+            } else {
+                // console.log(JSON.stringify(response))
                 minerData.miningStat.rejected++
-                minerData.miningStat.rejectedReason = "NO_RESPONSE"
+                minerData.miningStat.rejectedReason = response.data
+                minerData.logs.unshift({
+                    type: 'danger',
+                    time: Date.now(),
+                    title: 'Hash rejected',
+                    message: response.data
+                })
             }
             submitResponse = response
             minerData.miner.submitResponse = submitResponse
@@ -347,6 +406,17 @@ async function getMineInfo() {
         console.error(e)
     }
     return info
+}
+
+async function getMiningNodes() {
+    let url = App.state.settings.miningNode + '/mine.php?q=getMiningNodes'
+    let miningNodes = []
+    try {
+        miningNodes =  await Wallet.peerGet(url)
+    } catch (e) {
+        console.error(e)
+    }
+    return miningNodes
 }
 
 async function checkMineAddress() {
@@ -387,7 +457,10 @@ function clearLog() {
 }
 
 function updateMinerCpu(c) {
-    cpu = c
+    cpu = parseInt(c)
+    sleepTime = (100 - cpu) * 5
+    App.state.settings.miningCpu = cpu
+    App.storeSettings()
 }
 
 export {

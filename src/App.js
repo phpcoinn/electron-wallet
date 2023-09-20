@@ -46,7 +46,8 @@ let state = {
         miningNode: config.miningNode,
         autoWalletNode: false,
         walletNode: config.walletNode,
-        network: network
+        network: network,
+        miningCpu: 50
     },
     networks: networks,
     transactions: [],

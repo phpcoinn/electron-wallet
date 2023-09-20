@@ -18,7 +18,7 @@
             <div class="d-flex flex-fill p-3 flex-column">
 
 
-                <template v-if="!$store.state.appState.walletData.verifiedAddress">
+                <template v-if="!minerData.running && !$store.state.appState.walletData.verifiedAddress">
 
                     <div class="flex-fill d-flex align-items-center justify-content-center">
                         <div class="d-flex flex-column">
@@ -42,21 +42,25 @@
                 </template>
                 <template v-else>
 
+                    <template v-if="minerData">
+
+                        <div class="row mb-2 fs-5">
+                            <div class="col">
+                                CPU: {{cpu}}% Speed: {{minerData.miningStat.speed}} H/s
+                            </div>
+                            <div class="col">
+                                <input type="range" class="form-range" v-model="cpu" @change="updateMinerCpu" min="0" max="100">
+                            </div>
+                        </div>
+
+
+                    </template>
+
                     <template v-if="minerData.running">
 
                         <div class="d-flex flex-column">
 
-
                         <template v-if="minerData">
-
-                            <div class="row mb-2 fs-5">
-                                <div class="col">
-                                    Speed: {{minerData.miningStat.speed}} H/s
-                                </div>
-                                <div class="col">
-                                    <input type="range" class="form-range" v-model="cpu" @change="updateMinerCpu" min="0" max="100">
-                                </div>
-                            </div>
 
                             <div class="d-flex justify-content-between fs-5">
                                 <div>
@@ -237,6 +241,8 @@ export default {
     },
     mounted() {
         console.log("mounted miner")
+        this.cpu = this.$store.state.appState.settings.miningCpu || 50
+        this.updateMinerCpu()
     },
     methods:{
         startMiner() {

@@ -39,7 +39,7 @@ function get(url) {
 function post(url, postData) {
     return new Promise((resolve, reject) => {
         postData = new URLSearchParams(postData).toString()
-        console.log("Calling post", postData)
+        // console.log("Calling post", url, postData)
         let request = net.request({
             method: 'POST',
             url
