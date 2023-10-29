@@ -228,12 +228,12 @@ ipcMain.on('wallet-sign',   (event, arg) => {
   }
 })
 
-ipcMain.on('wallet-create-masternode',   async(event, arg) => {
-  let res = await Wallet.createMasternode(arg)
+ipcMain.on('wallet-create-masternode',   async(event, data) => {
+  let res = await Wallet.createMasternode(data.newMnAddress, data.newMnRewardAdress)
   event.returnValue = res
 })
-ipcMain.on('wallet-remove-masternode',  async (event, arg) => {
-  let res = await Wallet.removeMasternode(arg)
+ipcMain.on('wallet-remove-masternode',  async (event, data) => {
+  let res = await Wallet.removeMasternode(data.payoutAddress, data.mnAddress)
   event.returnValue = res
 })
 

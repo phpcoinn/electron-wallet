@@ -430,7 +430,13 @@ async function getMasternodes() {
     if(res.status === 'ok' && res.data) {
         walletMasternodes = res.data
     }
-    return {list, isWalletMn, walletMasternodes}
+    url = `${walletData.walletPeer}/api.php?q=getAddressInfo&address=${walletData.address}`
+    res = await Axios.get(url)
+    let addressInfo
+    if(res.status === 'ok' && res.data) {
+        addressInfo = res.data
+    }
+    return {list, isWalletMn, walletMasternodes, addressInfo}
 }
 
 async function exportWallet() {
@@ -555,20 +561,31 @@ async function signAndSend(tx) {
     return res
 }
 
-async function createMasternode(address) {
+async function createMasternode(address, rewardAddress = null) {
 
     let fee = 0
 
     try {
-        let amount = await getMasternodeCollateral()
-        let msg ='mncreate'
-        amount = Number(amount).toFixed(8)
-        fee = Number(fee).toFixed(8)
-        let dst = address.trim()
-        let type = 2
 
-        let tx = await sendTx(amount, fee, dst, msg, type)
+        let debug = ''
+        debug= '&XDEBUG_SESSION_START=PHPSTORM'
+        let url = `${walletData.walletPeer}/api.php?q=generateMasternodeCreateTx` + debug
+        let data = {}
+        data.address = walletData.address
+        data.mn_address = address
+        if(rewardAddress) {
+            data.reward_address = rewardAddress
+        }
+        let res = await Axios.post(url, {data: JSON.stringify(data)})
+        if(res.status !== 'ok') {
+            App.showError(res.data)
+            return false
+        }
+
+        let txData = res.data
+        let tx = await sendTx(txData.val, txData.fee, txData.dst, txData.msg, txData.type)
         await refresh()
+
         dialog.showMessageBoxSync(App.win, {type:'info', title:'Success', message:'Your transaction is created'})
         return tx
 
@@ -579,20 +596,27 @@ async function createMasternode(address) {
     }
 }
 
-async function removeMasternode(address) {
+async function removeMasternode(payoutAddress, mnAddress = null) {
     console.log("call wallet-remove-masternode")
-    let amount = await getMasternodeForAddress(walletData.address)
-    let fee = 0
+
     try {
+        let debug = ''
+        debug= '&XDEBUG_SESSION_START=PHPSTORM'
+        let url = `${walletData.walletPeer}/api.php?q=generateMasternodeRemoveTx` + debug
+        let data = {}
+        data.address = walletData.address
+        data.payout_address = payoutAddress
+        if(mnAddress) {
+            data.mn_address = mnAddress
+        }
+        let res = await Axios.post(url, {data: JSON.stringify(data)})
+        if(res.status !== 'ok') {
+            App.showError(res.data)
+            return false
+        }
 
-        let msg ='mnremove'
-        amount = Number(amount).toFixed(8)
-        fee = Number(fee).toFixed(8)
-        let dst = address.trim()
-        let type = 3
-
-        let tx = await sendTx(amount, fee, dst, msg, type)
-
+        let txData = res.data
+        let tx = await sendTx(txData.val, txData.fee, txData.dst, txData.msg, txData.type)
         await refresh()
 
         dialog.showMessageBoxSync(App.win, {type:'info', title:'Success', message:'Your transaction is created'})
