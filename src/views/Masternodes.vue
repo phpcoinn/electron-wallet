@@ -142,7 +142,7 @@
                 </div>
                 <div class="form-group">
                     <input type="text" class="form-control" placeholder="Address" v-model="newMnAddress">
-                    <input type="text" class="form-control mt-2" placeholder="Reward address" v-model="newMnRewardAdress">
+                    <input type="text" class="form-control mt-2" placeholder="Reward address" v-model="newMnRewardAdress" v-if="addressInfo.cold_masternode_enabled">
                     <div class="d-grid gap-2 mt-2">
                         <button type="button"  @click="createNewMnTx" class="btn btn-outline-primary">Create new masternode</button>
                     </div>
