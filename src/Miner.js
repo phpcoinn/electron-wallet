@@ -419,23 +419,6 @@ async function getMiningNodes() {
     return miningNodes
 }
 
-async function checkMineAddress() {
-    let address = App.state.walletData.address
-    let postData = {
-        address
-    }
-    try {
-        let response = await Axios.post(App.state.settings.miningNode + '/mine.php?q=checkAddress', postData)
-        if (response.status === 'ok') {
-            if(response.data === address) {
-                return true
-            }
-        }
-    } catch (e) {
-        console.log(e)
-        return false
-    }
-}
 
 function stop() {
     console.log("stopping miner")
