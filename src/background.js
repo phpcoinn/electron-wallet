@@ -1,6 +1,9 @@
 'use strict'
 
 import {app, protocol, BrowserWindow, shell, dialog, Menu, clipboard} from 'electron'
+if (process.env.NODE_ENV === 'development' || process.platform === 'linux') {
+  app.commandLine.appendSwitch('no-sandbox');
+}
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 import {ipcMain} from "electron";
